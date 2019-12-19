@@ -2423,8 +2423,8 @@ bool CBlock::AcceptBlock()
     CBlockIndex* pindexPrev = (*mi).second;
     int nHeight = pindexPrev->nHeight+1;
 
-	if (IsProofOfStake() && nHeight < POS_START_BLOCK)
-        return DoS(100, error("AcceptBlock() : No PoS block allowed before %d (height= %d))",POS_START_BLOCK, nHeight));
+	if (IsProofOfStake() && nHeight < getPosStartBlock())
+        return DoS(100, error("AcceptBlock() : No PoS block allowed before %d (height= %d))",getPosStartBlock(), nHeight));
 
     // Check proof-of-work or proof-of-stake
     if (nBits != GetNextWorkRequired(pindexPrev, IsProofOfStake()))
