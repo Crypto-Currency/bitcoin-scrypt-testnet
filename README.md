@@ -1,4 +1,6 @@
-Bitcoin - sCrypt v2.0-release
+**Bitcoin - sCrypt Testnet repo**
+<br>
+please do not use on mainnet
 
 Official website:  https://bitcoinscrypt.io
 
