@@ -1286,12 +1286,11 @@ void BitcoinGUI::splashMessage(const std::string &message, bool quickSleep)
 
 void BitcoinGUI::backupWallet()
 {
-//    QString saveDir = QDesktopServices::storageLocation(QDesktopServices::DocumentsLocation);
-<<<<<<< HEAD
-  QString saveDir = QStandardPaths::writableLocation(QStandardPaths::DocumentsLocation);
-=======
+#if QT_VERSION < 0x050000
+	QString saveDir = QDesktopServices::storageLocation(QDesktopServices::DocumentsLocation);
+#else
     QString saveDir = QStandardPaths::writableLocation(QStandardPaths::DocumentsLocation);
->>>>>>> 4186fff02ab88efb41cc684f00b1b871439dcd58
+#endif
     QString filename = QFileDialog::getSaveFileName(this, tr("Backup Wallet"), saveDir, tr("Wallet Data (*.dat)"));
     if(!filename.isEmpty()) {
         if(!walletModel->backupWallet(filename)) {
