@@ -27,6 +27,7 @@ extern Value ValueFromAmount(int64 amount);
 extern std::string HelpRequiringPassphrase();
 extern void EnsureWalletIsUnlocked();
 
+
 void
 ScriptPubKeyToJSON(const CScript& scriptPubKey, Object& out)
 {
@@ -186,69 +187,97 @@ Value listunspent(const Array& params, bool fHelp)
     return results;
 }
 
+//std::vector<unsigned char> ParseHexV(const UniValue& v, std::string strName)
+//{
+//    std::string strHex;
+//    if (v.isStr())
+//        strHex = v.get_str();
+//    if (!IsHex(strHex))
+//        throw JSONRPCError(RPC_INVALID_PARAMETER, strName+" must be hexadecimal string (not '"+strHex+"')");
+//    return ParseHex(strHex);
+//}
+
 Value createrawtransaction(const Array& params, bool fHelp)
 {
-    if (fHelp || params.size() != 2)
-        throw runtime_error(
-            "createrawtransaction [{\"txid\":txid,\"vout\":n},...] {address:amount,...}\n"
-            "Create a transaction spending given inputs\n"
-            "(array of objects containing transaction id and output number),\n"
-            "sending to given address(es).\n"
-            "Returns hex-encoded raw transaction.\n"
-            "Note that the transaction's inputs are not signed, and\n"
-            "it is not stored in the wallet or transmitted to the network.");
+//    if (fHelp || params.size() != 2)
+  if (fHelp || params.size() < 2 || params.size() > 3)
+    throw runtime_error(
+      "createrawtransaction [{\"txid\":txid,\"vout\":n},...] {address:amount,\"data\":\"hex\",...}\n"
+      "Create a transaction spending given inputs\n"
+      "(array of objects containing transaction id and output number),\n"
+      "sending to given address(es).\n"
+      "Returns hex-encoded raw transaction.\n"
+      "Note that the transaction's inputs are not signed, and\n"
+      "it is not stored in the wallet or transmitted to the network.");
 
-    RPCTypeCheck(params, list_of(array_type)(obj_type));
+  RPCTypeCheck(params, list_of(array_type)(obj_type));
+  if (params[0].is_null() || params[1].is_null())
+    throw JSONRPCError(RPC_INVALID_PARAMETER, "Invalid parameter, arguments 1 and 2 must be non-null");
 
-    Array inputs = params[0].get_array();
-    Object sendTo = params[1].get_obj();
+  Array inputs = params[0].get_array();
+  Object sendTo = params[1].get_obj();
 
-    CTransaction rawTx;
+  CTransaction rawTx;
 
-    BOOST_FOREACH(Value& input, inputs)
+  BOOST_FOREACH(Value& input, inputs)
+  {
+    const Object& o = input.get_obj();
+
+    const Value& txid_v = find_value(o, "txid");
+    if (txid_v.type() != str_type)
+      throw JSONRPCError(-8, "Invalid parameter, missing txid key");
+
+    string txid = txid_v.get_str();
+    if (!IsHex(txid))
+      throw JSONRPCError(-8, "Invalid parameter, expected hex txid");
+
+    const Value& vout_v = find_value(o, "vout");
+    if (vout_v.type() != int_type)
+      throw JSONRPCError(-8, "Invalid parameter, missing vout key");
+
+    int nOutput = vout_v.get_int();
+    if (nOutput < 0)
+      throw JSONRPCError(-8, "Invalid parameter, vout must be positive");
+
+    CTxIn in(COutPoint(uint256(txid), nOutput));
+    rawTx.vin.push_back(in);
+  }
+
+  set<CBitcoinAddress> setAddress;
+  BOOST_FOREACH(const Pair& s, sendTo)
+  {
+    if (s.name_ == "data")
     {
-        const Object& o = input.get_obj();
 
-        const Value& txid_v = find_value(o, "txid");
-        if (txid_v.type() != str_type)
-            throw JSONRPCError(-8, "Invalid parameter, missing txid key");
-        string txid = txid_v.get_str();
-        if (!IsHex(txid))
-            throw JSONRPCError(-8, "Invalid parameter, expected hex txid");
+//throw JSONRPCError(-88, string("s.value_="+s.value_.get_str()));
+      std::string temp=s.value_.get_str();
+      std::vector<unsigned char> data(temp.begin(), temp.end());
 
-        const Value& vout_v = find_value(o, "vout");
-        if (vout_v.type() != int_type)
-            throw JSONRPCError(-8, "Invalid parameter, missing vout key");
-        int nOutput = vout_v.get_int();
-        if (nOutput < 0)
-            throw JSONRPCError(-8, "Invalid parameter, vout must be positive");
-
-        CTxIn in(COutPoint(uint256(txid), nOutput));
-        rawTx.vin.push_back(in);
+      CTxOut out(0, CScript() << OP_RETURN << data);
+      rawTx.vout.push_back(out);
     }
-
-    set<CBitcoinAddress> setAddress;
-    BOOST_FOREACH(const Pair& s, sendTo)
+    else
     {
-        CBitcoinAddress address(s.name_);
-        if (!address.IsValid())
-            throw JSONRPCError(-5, string("Invalid Bitcoin-sCrypt address:")+s.name_);
+      CBitcoinAddress address(s.name_);
+      if (!address.IsValid())
+        throw JSONRPCError(-5, string("Invalid Bitcoin-sCrypt address:")+s.name_);
 
-        if (setAddress.count(address))
-            throw JSONRPCError(-8, string("Invalid parameter, duplicated address: ")+s.name_);
-        setAddress.insert(address);
+      if (setAddress.count(address))
+        throw JSONRPCError(-8, string("Invalid parameter, duplicated address: ")+s.name_);
 
-        CScript scriptPubKey;
-        scriptPubKey.SetDestination(address.Get());
-        int64 nAmount = AmountFromValue(s.value_);
+      setAddress.insert(address);
 
-        CTxOut out(nAmount, scriptPubKey);
-        rawTx.vout.push_back(out);
+      CScript scriptPubKey;
+      scriptPubKey.SetDestination(address.Get());
+      int64 nAmount = AmountFromValue(s.value_);
+
+      CTxOut out(nAmount, scriptPubKey);
+      rawTx.vout.push_back(out);
     }
-
-    CDataStream ss(SER_NETWORK, PROTOCOL_VERSION);
-    ss << rawTx;
-    return HexStr(ss.begin(), ss.end());
+  }
+  CDataStream ss(SER_NETWORK, PROTOCOL_VERSION);
+  ss << rawTx;
+  return HexStr(ss.begin(), ss.end());
 }
 
 Value decoderawtransaction(const Array& params, bool fHelp)
