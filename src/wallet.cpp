@@ -1415,9 +1415,15 @@ bool CWallet::CreateTransaction(CScript scriptPubKey, int64 nValue, CWalletTx& w
                  continue;
          }
  
+//printf("nTime=%d\n",nTime);
+printf("pcoin.first->nTime=%d  %s\n",(int64)pcoin.first->nTime,ctime((long*)&pcoin.first->nTime));
+printf("GetTime()=%d  %s\n",(int64)GetTime(),ctime((long*)&pcoin.first->nTime));
+
          int64 nTimeWeight = GetWeight((int64)pcoin.first->nTime, (int64)GetTime());
          CBigNum bnCoinDayWeight = CBigNum(pcoin.first->vout[pcoin.second].nValue) * nTimeWeight / COIN / (24 * 60 * 60);
  
+printf("nTimeWeight=%d\n",nTimeWeight);
+printf("bnCoinWeight=%"PRI64d"\n",bnCoinDayWeight.getuint64());
          // Weight is greater than zero
          if (nTimeWeight > 0)
          {

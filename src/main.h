@@ -474,10 +474,20 @@ public:
 
     void SetNull()
     {
+      if(fTestNet)
+      {
+        if(nBestHeight >TESTNET_POS_START_BLOCK)
+          nVersion = CTransaction::POS_VERSION;
+        else
+          nVersion = CTransaction::POW_VERSION;
+      }
+      else
+      {
         if(nBestHeight >POS_START_BLOCK)
           nVersion = CTransaction::POS_VERSION;
         else
           nVersion = CTransaction::POW_VERSION;
+      }
 
         vin.clear();
         vout.clear();
