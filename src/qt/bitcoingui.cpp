@@ -66,6 +66,8 @@
 #include <QMimeData>
 
 #include <iostream>
+#include <boost/filesystem.hpp>
+#include <boost/filesystem/fstream.hpp>
 
 extern CWallet *pwalletMain;
 extern int64 nLastCoinStakeSearchInterval;
