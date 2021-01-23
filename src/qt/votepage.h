@@ -20,8 +20,14 @@ class VotePage : public QWidget
 
 public:
   VotePage(QWidget *parent = 0);
+  ~VotePage();
 
 private slots:
+  void on_CB1_clicked();
+  void on_CB2_clicked();
+  void on_CB3_clicked();
+  void on_CB4_clicked();
+  void on_CB5_clicked();
 
 protected:
 
