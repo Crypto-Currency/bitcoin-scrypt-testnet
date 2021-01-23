@@ -63,7 +63,7 @@
        <property name="minimumSize">
         <size>
          <width>800</width>
-         <height>120</height>
+         <height>150</height>
         </size>
        </property>
        <property name="maximumSize">
@@ -95,7 +95,7 @@
         <property name="geometry">
          <rect>
           <x>10</x>
-          <y>30</y>
+          <y>50</y>
           <width>831</width>
           <height>20</height>
          </rect>
@@ -107,8 +107,8 @@
        <widget class="Q3GroupBox" name="groupBox">
         <property name="geometry">
          <rect>
-          <x>60</x>
-          <y>50</y>
+          <x>40</x>
+          <y>80</y>
           <width>781</width>
           <height>41</height>
          </rect>
