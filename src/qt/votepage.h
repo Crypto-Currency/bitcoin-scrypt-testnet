@@ -38,4 +38,32 @@ private:
 signals:
 };
 
+struct
+{
+  char BlockType[1];
+  char VoteNum[8];
+  char Question[100];
+  char ChoicesEnabled[1];
+  char Choice1[10];
+  char Choice2[10];
+  char Choice3[10];
+  char Choice4[10];
+  char Choice5[10];
+  char Vote[1];
+} ReadData;
+
+struct
+{
+  char BlockType[1];
+  char VoteNum[8];
+  char Question[100];
+  char ChoicesEnabled[1];
+  char Choice1[10];
+  char Choice2[10];
+  char Choice3[10];
+  char Choice4[10];
+  char Choice5[10];
+  char Vote[1];
+} WriteData;
+
 #endif

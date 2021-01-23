@@ -63,7 +63,7 @@
        <property name="minimumSize">
         <size>
          <width>800</width>
-         <height>100</height>
+         <height>120</height>
         </size>
        </property>
        <property name="maximumSize">
@@ -94,9 +94,9 @@
        <widget class="QLabel" name="questionString">
         <property name="geometry">
          <rect>
-          <x>90</x>
-          <y>10</y>
-          <width>751</width>
+          <x>10</x>
+          <y>30</y>
+          <width>831</width>
           <height>20</height>
          </rect>
         </property>
@@ -107,10 +107,10 @@
        <widget class="Q3GroupBox" name="groupBox">
         <property name="geometry">
          <rect>
-          <x>59</x>
-          <y>39</y>
+          <x>60</x>
+          <y>50</y>
           <width>781</width>
-          <height>61</height>
+          <height>41</height>
          </rect>
         </property>
         <property name="title">
@@ -120,7 +120,7 @@
          <property name="geometry">
           <rect>
            <x>10</x>
-           <y>30</y>
+           <y>20</y>
            <width>97</width>
            <height>22</height>
           </rect>
@@ -133,7 +133,7 @@
          <property name="geometry">
           <rect>
            <x>150</x>
-           <y>30</y>
+           <y>20</y>
            <width>97</width>
            <height>22</height>
           </rect>
@@ -146,7 +146,7 @@
          <property name="geometry">
           <rect>
            <x>280</x>
-           <y>30</y>
+           <y>20</y>
            <width>97</width>
            <height>22</height>
           </rect>
@@ -159,7 +159,7 @@
          <property name="geometry">
           <rect>
            <x>420</x>
-           <y>30</y>
+           <y>20</y>
            <width>97</width>
            <height>22</height>
           </rect>
@@ -172,7 +172,7 @@
          <property name="geometry">
           <rect>
            <x>570</x>
-           <y>30</y>
+           <y>20</y>
            <width>97</width>
            <height>22</height>
           </rect>
@@ -181,6 +181,19 @@
           <string>E</string>
          </property>
         </widget>
+       </widget>
+       <widget class="QLabel" name="Qnum">
+        <property name="geometry">
+         <rect>
+          <x>90</x>
+          <y>10</y>
+          <width>66</width>
+          <height>17</height>
+         </rect>
+        </property>
+        <property name="text">
+         <string>00000000</string>
+        </property>
        </widget>
       </widget>
      </item>
