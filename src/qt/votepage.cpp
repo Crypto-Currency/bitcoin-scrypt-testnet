@@ -6,6 +6,8 @@
 #include <QSettings>
 #include <string>
 #include <QMainWindow>
+#include <QMessageBox>
+
 #include "ui_interface.h"
 
 extern BitcoinGUI *guiref;
@@ -24,10 +26,11 @@ VotePage::VotePage(QWidget *parent) : QWidget(parent), ui(new Ui::VotePage)
   connect(ui->CB3, SIGNAL(clicked(bool)), this, SLOT(on_CB3_clicked()));
   connect(ui->CB4, SIGNAL(clicked(bool)), this, SLOT(on_CB4_clicked()));
   connect(ui->CB5, SIGNAL(clicked(bool)), this, SLOT(on_CB5_clicked()));
+  connect(ui->SendButton, SIGNAL(clicked(bool)), this, SLOT(on_SendButton_clicked()));
 
 char bdataread[]="000000001This would allow the BTCS wallet client to enable users to send messages to other BTCS wallets in a completely decentralized and censorship free manner world-wide.";
 
-  memcpy(&ReadData,bdataread,161);
+  memcpy(&ReadData,bdataread,160);
 
   ui->Qnum->setText(ReadData.VoteNum);
   ui->questionString->setText(ReadData.Question);
@@ -89,4 +92,20 @@ void VotePage::on_CB5_clicked()
   ui->CB4->setChecked(false);
   ui->CB5->setChecked(true);
 }
+
+void VotePage::on_SendButton_clicked()
+{
+  QMessageBox::StandardButton retval = QMessageBox::question(this, tr("Confirm your vote"),
+    tr("Are you sure you want to submit your chioce?"),
+    QMessageBox::Yes|QMessageBox::Cancel,
+    QMessageBox::Cancel);
+
+  if(retval != QMessageBox::Yes)
+  {
+    return;
+  }
+  // continue if true
+
+}
+
 

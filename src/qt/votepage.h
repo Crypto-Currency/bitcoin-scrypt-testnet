@@ -28,6 +28,7 @@ private slots:
   void on_CB3_clicked();
   void on_CB4_clicked();
   void on_CB5_clicked();
+  void on_SendButton_clicked();
 
 protected:
 
@@ -49,7 +50,6 @@ struct
   char Choice3[10];
   char Choice4[10];
   char Choice5[10];
-  char Vote[1];
 } ReadData;
 
 struct
@@ -63,7 +63,13 @@ struct
   char Choice3[10];
   char Choice4[10];
   char Choice5[10];
-  char Vote[1];
 } WriteData;
+
+struct
+{
+  char BlockType[1];
+  char VoteNum[8];
+  char Vote[1];
+} VoteData;
 
 #endif

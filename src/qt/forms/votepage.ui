@@ -95,7 +95,7 @@
         <property name="geometry">
          <rect>
           <x>10</x>
-          <y>50</y>
+          <y>40</y>
           <width>831</width>
           <height>20</height>
          </rect>
@@ -107,8 +107,8 @@
        <widget class="Q3GroupBox" name="groupBox">
         <property name="geometry">
          <rect>
-          <x>40</x>
-          <y>80</y>
+          <x>30</x>
+          <y>70</y>
           <width>781</width>
           <height>41</height>
          </rect>
@@ -193,6 +193,19 @@
         </property>
         <property name="text">
          <string>00000000</string>
+        </property>
+       </widget>
+       <widget class="QPushButton" name="SendButton">
+        <property name="geometry">
+         <rect>
+          <x>710</x>
+          <y>120</y>
+          <width>110</width>
+          <height>27</height>
+         </rect>
+        </property>
+        <property name="text">
+         <string> Submit vote </string>
         </property>
        </widget>
       </widget>
