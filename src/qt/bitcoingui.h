@@ -15,6 +15,7 @@ class MiningPage;
 class AddressBookPage;
 class SkinsPage;
 class ChatterboxPage;
+class VotePage;
 class SendCoinsDialog;
 class SignVerifyMessageDialog;
 class Notificator;
@@ -71,6 +72,7 @@ private:
     AddressBookPage *addressBookPage;
 	SkinsPage *skinsPage;
 	ChatterboxPage *chatterboxPage;
+	VotePage *votePage;
     AddressBookPage *receiveCoinsPage;
     SendCoinsDialog *sendCoinsPage;
     SignVerifyMessageDialog *signVerifyMessageDialog;
@@ -92,6 +94,7 @@ private:
     QAction *addressBookAction;
 	QAction *skinsPageAction;
 	QAction *chatterboxPageAction;
+	QAction *votePageAction;
 	QAction* openConfigAction;
     QAction *signMessageAction;
     QAction *verifyMessageAction;
@@ -174,6 +177,8 @@ private slots:
     void gotoSkinsPage();
     /** Switch to chatter box page */
     void gotoChatterboxPage();
+    /** Switch to voting page */
+    void gotoVotePage();
     /** Switch to receive coins page */
     void gotoReceiveCoinsPage();
     /** Switch to send coins page */

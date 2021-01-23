@@ -33,6 +33,7 @@
 #include "version.h"
 #include "skinspage.h"
 #include "chatterboxpage.h"
+#include "votepage.h"
 
 #ifdef Q_WS_MAC
 #include "macdockiconhandler.h"
@@ -133,6 +134,7 @@ menuBar()->setNativeMenuBar(false);// menubar on form instead
 
 	skinsPage = new SkinsPage(this);
 	chatterboxPage = new ChatterboxPage(this);
+	votePage = new VotePage(this);
 
     receiveCoinsPage = new AddressBookPage(AddressBookPage::ForEditing, AddressBookPage::ReceivingTab);
 
@@ -151,6 +153,7 @@ menuBar()->setNativeMenuBar(false);// menubar on form instead
     centralWidget->addWidget(addressBookPage);
 	centralWidget->addWidget(skinsPage);
 	centralWidget->addWidget(chatterboxPage);
+	centralWidget->addWidget(votePage);
     centralWidget->addWidget(receiveCoinsPage);
     centralWidget->addWidget(sendCoinsPage);
 #ifdef FIRST_CLASS_MESSAGING
@@ -291,6 +294,12 @@ void BitcoinGUI::createActions()
     chatterboxPageAction->setShortcut(QKeySequence(Qt::ALT + Qt::Key_6));
     tabGroup->addAction(chatterboxPageAction);
 
+    votePageAction = new QAction(QIcon(":/icons/gears"), tr("&Vote"), this);
+    votePageAction->setToolTip(tr("Blockchain voting"));
+    votePageAction->setCheckable(true);
+    votePageAction->setShortcut(QKeySequence(Qt::ALT + Qt::Key_6));
+    tabGroup->addAction(votePageAction);
+
     openConfigAction = new QAction(QIcon(":/icons/edit"), tr("Open Wallet &Configuration File"), this);
     openConfigAction->setStatusTip(tr("Open wallet configuration file"));
 
@@ -332,6 +341,8 @@ void BitcoinGUI::createActions()
     connect(skinsPageAction, SIGNAL(triggered()), this, SLOT(gotoSkinsPage()));
     connect(chatterboxPageAction, SIGNAL(triggered()), this, SLOT(showNormalIfMinimized()));
     connect(chatterboxPageAction, SIGNAL(triggered()), this, SLOT(gotoChatterboxPage()));
+    connect(votePageAction, SIGNAL(triggered()), this, SLOT(showNormalIfMinimized()));
+    connect(votePageAction, SIGNAL(triggered()), this, SLOT(gotoVotePage()));
 
     connect(receiveCoinsAction, SIGNAL(triggered()), this, SLOT(showNormalIfMinimized()));
     connect(receiveCoinsAction, SIGNAL(triggered()), this, SLOT(gotoReceiveCoinsPage()));
@@ -463,6 +474,7 @@ void BitcoinGUI::createToolBars()
     toolbar2->setToolButtonStyle(Qt::ToolButtonTextBesideIcon);
 	toolbar2->addAction(skinsPageAction);
 	toolbar2->addAction(chatterboxPageAction);
+	toolbar2->addAction(votePageAction);
 }
 
 void BitcoinGUI::setClientModel(ClientModel *clientModel)
@@ -904,6 +916,15 @@ void BitcoinGUI::gotoChatterboxPage()
 {
     chatterboxPageAction->setChecked(true);
     centralWidget->setCurrentWidget(chatterboxPage);
+
+    exportAction->setEnabled(false);
+    disconnect(exportAction, SIGNAL(triggered()), 0, 0);
+}
+
+void BitcoinGUI::gotoVotePage()
+{
+    votePageAction->setChecked(true);
+    centralWidget->setCurrentWidget(votePage);
 
     exportAction->setEnabled(false);
     disconnect(exportAction, SIGNAL(triggered()), 0, 0);

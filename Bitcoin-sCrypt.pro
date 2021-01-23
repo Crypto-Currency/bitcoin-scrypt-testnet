@@ -5,8 +5,10 @@ INCLUDEPATH += src src/json src/qt /usr/include/libdb4
 DEFINES += QT_GUI BOOST_THREAD_USE_LIB BOOST_SPIRIT_THREADSAFE BOOST_ASIO_ENABLE_OLD_SERVICES
 CONFIG += no_include_pwd
 CONFIG += thread -w
-QT += widgets
+//QT += widgets
 QT += network
+QT += qt3support
+QT += core gui webkit
 
 OBJECTS_DIR = build
 MOC_DIR = build
@@ -127,6 +129,7 @@ HEADERS += src/qt/bitcoingui.h \
     src/init.h \
 	src/qt/skinspage.h \
 	src/qt/chatterboxpage.h \
+	src/qt/votepage.h \
     src/mruset.h \
     src/json/json_spirit_writer_template.h \
     src/json/json_spirit_writer.h \
@@ -192,6 +195,7 @@ SOURCES += src/qt/bitcoin.cpp src/qt/bitcoingui.cpp \
     src/init.cpp \
 	src/qt/skinspage.cpp \
 	src/qt/chatterboxpage.cpp \
+	src/qt/votepage.cpp \
     src/net.cpp \
     src/checkpoints.cpp \
     src/addrman.cpp \
@@ -248,6 +252,7 @@ FORMS += \
     src/qt/forms/addressbookpage.ui \
     src/qt/forms/skinspage.ui \
     src/qt/forms/chatterboxpage.ui \
+    src/qt/forms/votepage.ui \
     src/qt/forms/signverifymessagedialog.ui \
     src/qt/forms/aboutdialog.ui \
     src/qt/forms/editaddressdialog.ui \
