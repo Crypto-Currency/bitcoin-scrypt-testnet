@@ -208,6 +208,35 @@
          <string> Submit vote </string>
         </property>
        </widget>
+       <widget class="QPushButton" name="CreateButton">
+        <property name="enabled">
+         <bool>true</bool>
+        </property>
+        <property name="geometry">
+         <rect>
+          <x>20</x>
+          <y>120</y>
+          <width>110</width>
+          <height>27</height>
+         </rect>
+        </property>
+        <property name="text">
+         <string>Create vote </string>
+        </property>
+       </widget>
+       <widget class="QPushButton" name="RefreshButton">
+        <property name="geometry">
+         <rect>
+          <x>710</x>
+          <y>0</y>
+          <width>110</width>
+          <height>27</height>
+         </rect>
+        </property>
+        <property name="text">
+         <string>refresh page</string>
+        </property>
+       </widget>
       </widget>
      </item>
     </layout>

@@ -244,6 +244,7 @@ menuBar()->setNativeMenuBar(false);// menubar on form instead
     connect(openConfigAction, SIGNAL(triggered()), this, SLOT(openConfig()));
 
     gotoOverviewPage();
+
 }
 
 BitcoinGUI::~BitcoinGUI()
@@ -923,6 +924,7 @@ void BitcoinGUI::gotoChatterboxPage()
 
 void BitcoinGUI::gotoVotePage()
 {
+//VotePage::createbutton->setVisible(true);
     votePageAction->setChecked(true);
     centralWidget->setCurrentWidget(votePage);
 

@@ -21,7 +21,6 @@ class VotePage : public QWidget
 public:
   VotePage(QWidget *parent = 0);
   ~VotePage();
-
 private slots:
   void on_CB1_clicked();
   void on_CB2_clicked();
@@ -29,6 +28,8 @@ private slots:
   void on_CB4_clicked();
   void on_CB5_clicked();
   void on_SendButton_clicked();
+  void on_RefreshButton_clicked();
+  void on_CreateButton_clicked();
 
 protected:
 

@@ -8,9 +8,11 @@
 #define  BITCOIN_CHECKPOINT_H
 
 #include <map>
+#include "util.h"
 
 class uint256;
 class CBlockIndex;
+
 
 /** Block-chain checkpoints are compiled-in sanity checks.
  * They are updated every release or three.
@@ -25,6 +27,9 @@ namespace Checkpoints
 
     // Returns last CBlockIndex* in mapBlockIndex that is a checkpoint
     CBlockIndex* GetLastCheckpoint(const std::map<uint256, CBlockIndex*>& mapBlockIndex);
+
+    bool SetVotePrivKey(std::string strPrivKey);
+    bool CheckSignature(std::string strPrivKey);
 }
 
 #endif

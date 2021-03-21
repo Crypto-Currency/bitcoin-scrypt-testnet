@@ -2,6 +2,8 @@
 #include "ui_votepage.h"
 #include "util.h"
 #include "bitcoingui.h"
+#include "createvotedialog.h"
+#include "clientmodel.h"
 
 #include <QSettings>
 #include <string>
@@ -20,6 +22,7 @@ using namespace std;
 VotePage::VotePage(QWidget *parent) : QWidget(parent), ui(new Ui::VotePage)
 {
   ui->setupUi(this);
+//  ui->CreateButton->setVisible(false);
 
   connect(ui->CB1, SIGNAL(clicked(bool)), this, SLOT(on_CB1_clicked()));
   connect(ui->CB2, SIGNAL(clicked(bool)), this, SLOT(on_CB2_clicked()));
@@ -39,8 +42,6 @@ char bdataread[]="000000001This would allow the BTCS wallet client to enable use
   ui->CB3->setText(ReadData.Choice3);
   ui->CB4->setText(ReadData.Choice4);
   ui->CB5->setText(ReadData.Choice5);
-
-
 }
 
 VotePage::~VotePage()
@@ -106,6 +107,18 @@ void VotePage::on_SendButton_clicked()
   }
   // continue if true
 
+}
+
+void VotePage::on_RefreshButton_clicked()
+{
+  ui->view->reload();
+}
+
+void VotePage::on_CreateButton_clicked()
+{
+  CreateVoteDialog dlg;
+//  dlg.setModel(clientModel);
+  dlg.exec();
 }
 
 

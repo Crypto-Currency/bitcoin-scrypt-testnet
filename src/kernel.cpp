@@ -30,7 +30,7 @@ int64 GetWeight(int64 nIntervalBeginning, int64 nIntervalEnd)
 	// Kernel hash weight starts from 0 at the 30-day min age
 	// this change increases active coins participating the hash and helps
 	// to secure the network when proof-of-stake difficulty is low
-printf("GetWeight-> GetStakeMinAge=%d\n",GetStakeMinAge(nIntervalEnd));
+//printf("GetWeight-> GetStakeMinAge=%d\n",GetStakeMinAge(nIntervalEnd));
 
   return min(nIntervalEnd - nIntervalBeginning - GetStakeMinAge(nIntervalEnd), (int64)GetStakeMaxAge(nIntervalEnd));
 }

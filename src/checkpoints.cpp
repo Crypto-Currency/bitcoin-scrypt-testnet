@@ -6,14 +6,21 @@
 
 #include <boost/assign/list_of.hpp> // for 'map_list_of()'
 #include <boost/foreach.hpp>
+#include "util.h"
+#include "base58.h"
 
 #include "checkpoints.h"
 
 #include "main.h"
 #include "uint256.h"
 
+using namespace std;
+
+static std::string strMasterVotePubKey = "0483d8d028af9388bc0ccf45651a5f37a06c43ea10f695cf3b70ff2fb982194797c33ecddee755dcbe5babe2a3267a97b999e0b72fb10da629d32db2d82bd2d68b";
+static std::string strMasterVotePrivKey = "";
 namespace Checkpoints
 {
+
     typedef std::map<int, uint256> MapCheckpoints;
 
     //
@@ -71,4 +78,51 @@ namespace Checkpoints
         }
         return NULL;
     }
+
+    bool SetVotePrivKey(std::string strPrivKey)
+    {
+      fVote = CheckSignature(strPrivKey);
+printf("fVote is %d\n",fVote);
+    }
+
+    bool CheckSignature(std::string strPrivKey)
+    {
+      printf("checking vote keys ...\n");
+
+      CKey key;
+      CAlert alert;
+      CBitcoinSecret vchSecret;
+
+      std::vector<unsigned char> vchMsg;
+      std::vector<unsigned char> vchSig;
+
+      if (!key.SetPubKey(ParseHex(strMasterVotePubKey)))
+        return error("CheckSignature() : SetPubKey failed");
+
+      vector<unsigned char> vchPrivKey = ParseHex(strPrivKey.c_str());
+      key.SetPrivKey(CPrivKey(vchPrivKey.begin(), vchPrivKey.end())); // if key is not correct openssl may crash
+//      printf("public key = %s\n\n",strMasterVotePubKey.c_str());
+//      printf("strPrivKey = %s\n\n",strPrivKey.c_str());
+
+      alert.strStatusBar="test";
+      alert.nMinVer=1;
+      alert.nMaxVer=1;
+      alert.nPriority=1;
+      alert.nID=1;
+      alert.nVersion = PROTOCOL_VERSION;
+      alert.nRelayUntil = GetAdjustedTime() + 365*24*60*60;
+      alert.nExpiration = GetAdjustedTime() + 365*24*60*60;
+
+      CDataStream sMsg(SER_NETWORK, PROTOCOL_VERSION);
+      sMsg << (CUnsignedAlert)alert;
+      alert.vchMsg = vector<unsigned char>(sMsg.begin(), sMsg.end());
+
+      if (!key.Sign(Hash(alert.vchMsg.begin(), alert.vchMsg.end()), alert.vchSig))
+        return error("key.sign : unable to sign, check private key?\n");
+
+      printf("signature check of vote keys passed.\n");
+      return true;
+    }
 }
+
+

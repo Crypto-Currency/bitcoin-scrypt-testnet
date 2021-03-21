@@ -12,6 +12,7 @@
 #include "util.h"
 #include "main.h"
 #include "ui_interface.h"
+#include "checkpoints.h"
 #include <boost/filesystem.hpp>
 #include <boost/filesystem/fstream.hpp>
 #include <boost/filesystem/convenience.hpp>
@@ -582,6 +583,13 @@ bool AppInit2()
             InitError(_("Invalid amount for -reservebalance=<amount>"));
             return false;
         }
+    }
+
+    if (mapArgs.count("-votekey")) // vote master priv key
+    {
+        if (!Checkpoints::SetVotePrivKey(GetArg("-votekey", "")))
+//        if (!CSvote::SetVotePrivKey(GetArg("-votekey", "")))
+            InitError(_("Unable to load vote prive key, wrong votekey?\n"));
     }
 
     BOOST_FOREACH(string strDest, mapMultiArgs["-seednode"])
