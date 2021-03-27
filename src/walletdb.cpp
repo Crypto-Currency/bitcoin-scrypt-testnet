@@ -615,15 +615,16 @@ void ThreadFlushWalletDB(void* parg)
                     map<string, int>::iterator mi = bitdb.mapFileUseCount.find(strFile);
                     if (mi != bitdb.mapFileUseCount.end())
                     {
+                      if (fDebug)
                         printf("Flushing wallet.dat\n");
-                        nLastFlushed = nWalletDBUpdated;
-                        int64 nStart = GetTimeMillis();
+                      nLastFlushed = nWalletDBUpdated;
+                      int64 nStart = GetTimeMillis();
 
-                        // Flush wallet.dat so it's self contained
-                        bitdb.CloseDb(strFile);
-                        bitdb.CheckpointLSN(strFile);
-
-                        bitdb.mapFileUseCount.erase(mi++);
+                      // Flush wallet.dat so it's self contained
+                      bitdb.CloseDb(strFile);
+                      bitdb.CheckpointLSN(strFile);
+                      bitdb.mapFileUseCount.erase(mi++);
+                      if (fDebug)
                         printf("Flushed wallet.dat %" PRI64d "ms\n", GetTimeMillis() - nStart);
                     }
                 }
