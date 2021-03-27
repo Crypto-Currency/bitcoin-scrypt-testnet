@@ -22,7 +22,8 @@ private:
     Ui::CreateVoteDialog *ui;
 
 private slots:
-    void on_buttonBox_accepted();
+    void on_SendButton_clicked();
+    void on_RefreshButton_clicked();
 };
 
 #endif // CREATEVOTEDIALOG_H
