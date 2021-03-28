@@ -42,7 +42,7 @@ signals:
 
 struct ReadData
 {
-  unsigned char BlockType[1];
+  unsigned char BlockType[1]; //1-question 2-question pt2 3-vote
   unsigned char VoteNum[8];
   unsigned char Question[100];
   unsigned char ChoicesEnabled[1];
@@ -55,22 +55,16 @@ struct ReadData
 
 struct
 {
-  char BlockType[1];
-  char VoteNum[8];
-  char Question[100];
-  char ChoicesEnabled[1];
-  char Choice1[10];
-  char Choice2[10];
-  char Choice3[10];
-  char Choice4[10];
-  char Choice5[10];
+  unsigned char BlockType[1];
+  unsigned char VoteNum[8];
+  unsigned char Question[100];
+  unsigned char ChoicesEnabled[1];
+  unsigned char Choice1[10];
+  unsigned char Choice2[10];
+  unsigned char Choice3[10];
+  unsigned char Choice4[10];
+  unsigned char Choice5[10];
 } WriteData;
 
-struct
-{
-  char BlockType[1];
-  char VoteNum[8];
-  char Vote[1];
-} VoteData;
 
 #endif

@@ -101,7 +101,7 @@
          </rect>
         </property>
         <property name="title">
-         <string>Choices</string>
+         <string>Choices  (10 char max)</string>
         </property>
         <widget class="QLabel" name="label">
          <property name="geometry">
@@ -124,6 +124,9 @@
            <width>291</width>
            <height>27</height>
           </rect>
+         </property>
+         <property name="maxLength">
+          <number>10</number>
          </property>
         </widget>
         <widget class="QLabel" name="label_2">
@@ -152,7 +155,7 @@
           <string>C</string>
          </property>
         </widget>
-        <widget class="QLineEdit" name="lineEdit">
+        <widget class="QLineEdit" name="A2">
          <property name="geometry">
           <rect>
            <x>30</x>
@@ -161,8 +164,11 @@
            <height>27</height>
           </rect>
          </property>
+         <property name="maxLength">
+          <number>10</number>
+         </property>
         </widget>
-        <widget class="QLineEdit" name="lineEdit_2">
+        <widget class="QLineEdit" name="A3">
          <property name="geometry">
           <rect>
            <x>30</x>
@@ -170,6 +176,9 @@
            <width>291</width>
            <height>27</height>
           </rect>
+         </property>
+         <property name="maxLength">
+          <number>10</number>
          </property>
         </widget>
         <widget class="QLabel" name="label_4">
@@ -185,7 +194,7 @@
           <string>D</string>
          </property>
         </widget>
-        <widget class="QLineEdit" name="lineEdit_3">
+        <widget class="QLineEdit" name="A4">
          <property name="geometry">
           <rect>
            <x>30</x>
@@ -193,6 +202,9 @@
            <width>291</width>
            <height>27</height>
           </rect>
+         </property>
+         <property name="maxLength">
+          <number>10</number>
          </property>
         </widget>
         <widget class="QLabel" name="label_5">
@@ -208,7 +220,7 @@
           <string>E</string>
          </property>
         </widget>
-        <widget class="QLineEdit" name="lineEdit_4">
+        <widget class="QLineEdit" name="A5">
          <property name="geometry">
           <rect>
            <x>30</x>
@@ -217,20 +229,10 @@
            <height>27</height>
           </rect>
          </property>
+         <property name="maxLength">
+          <number>10</number>
+         </property>
         </widget>
-       </widget>
-       <widget class="QPushButton" name="SendButton">
-        <property name="geometry">
-         <rect>
-          <x>679</x>
-          <y>300</y>
-          <width>141</width>
-          <height>27</height>
-         </rect>
-        </property>
-        <property name="text">
-         <string> Submit Question</string>
-        </property>
        </widget>
        <widget class="QPushButton" name="RefreshButton">
         <property name="geometry">
@@ -253,6 +255,9 @@
           <width>113</width>
           <height>27</height>
          </rect>
+        </property>
+        <property name="maxLength">
+         <number>8</number>
         </property>
        </widget>
        <widget class="QLabel" name="qLabel">
@@ -282,6 +287,48 @@
           <width>731</width>
           <height>31</height>
          </rect>
+        </property>
+        <property name="maxLength">
+         <number>100</number>
+        </property>
+       </widget>
+       <widget class="QPushButton" name="SendButton">
+        <property name="geometry">
+         <rect>
+          <x>300</x>
+          <y>300</y>
+          <width>141</width>
+          <height>27</height>
+         </rect>
+        </property>
+        <property name="text">
+         <string> Submit Question</string>
+        </property>
+       </widget>
+       <widget class="QPushButton" name="ClearButton">
+        <property name="geometry">
+         <rect>
+          <x>10</x>
+          <y>300</y>
+          <width>141</width>
+          <height>27</height>
+         </rect>
+        </property>
+        <property name="text">
+         <string>Clear All</string>
+        </property>
+       </widget>
+       <widget class="QPushButton" name="CancelButton">
+        <property name="geometry">
+         <rect>
+          <x>670</x>
+          <y>300</y>
+          <width>141</width>
+          <height>27</height>
+         </rect>
+        </property>
+        <property name="text">
+         <string>Cancel</string>
         </property>
        </widget>
       </widget>

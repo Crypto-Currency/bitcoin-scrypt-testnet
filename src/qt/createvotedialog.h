@@ -23,6 +23,8 @@ private:
 
 private slots:
     void on_SendButton_clicked();
+    void on_ClearButton_clicked();
+    void on_CancelButton_clicked();
     void on_RefreshButton_clicked();
 };
 
