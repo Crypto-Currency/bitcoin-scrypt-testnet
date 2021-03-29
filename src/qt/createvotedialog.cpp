@@ -79,7 +79,7 @@ printf("%d answers\n",qnum);
   // transfer data to votepage
   wrChoicesEnabled=boost::to_string(qnum);
   wrQuestion=ui->Qtext->text().toStdString();
-printf("new question mess= |%s|\n",wrQuestion.c_str());
+//printf("new question mess= |%s|\n",wrQuestion.c_str());
 
   wrVoteNum=ui->Qnum->text().toStdString();
   wrChoice1=ui->A1->text().toStdString();

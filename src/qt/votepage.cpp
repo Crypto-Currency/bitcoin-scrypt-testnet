@@ -39,7 +39,7 @@ string wrChoice4;
 string wrChoice5;
 
 ReadData rd;
-
+WriteData wr;
 VotePage::VotePage(QWidget *parent) : QWidget(parent), ui(new Ui::VotePage)
 {
   ui->setupUi(this);
@@ -223,22 +223,20 @@ void VotePage::on_RefreshButton_clicked()
 void VotePage::on_CreateButton_clicked()
 {
   CreateVoteDialog dlg;
-//  dlg.exec();
-
-//QString result;
   if (dlg.exec() == QDialog::Accepted)
   {
-//    result = dlg->selectedFile();
-//    workingDirectory = dlg->url();
-    printf("accepted is true\n");
-printf(" block type %s\n",wrBlockType.c_str());
-printf("%s %s\n",wrVoteNum.c_str(),wrQuestion.c_str());
-printf("1 %s\n",wrChoice1.c_str());
-printf("2 %s\n",wrChoice2.c_str());
-printf("3 %s\n",wrChoice3.c_str());
-printf("4 %s\n",wrChoice4.c_str());
-printf("5 %s\n",wrChoice5.c_str());
+    buffWRblock();  // add spaces to fill
 
+    string mess;
+unsigned char temp[160];
+//mess=boost::lexical_cast<string>(wr.BlockType); // yes, nasty
+  memcpy(temp,&wr,160);
+
+//debug
+printf("\nstart dump:\n");
+HexDump(temp,160); 
+printf("\nend dump\n\n");
+printf("temp is:\n|%s|\n",temp);
   }
   else
   {
@@ -247,4 +245,129 @@ printf("5 %s\n",wrChoice5.c_str());
 
 }
 
+//---------------------------------------------------------------------------
+void VotePage::HexDump(unsigned char* pBuffer, int size)
+{
+  printf("\nHexDump output:%d  chars [0x%s]\n",size,IntToHex(size,2).c_str());
+  string c;
+  c="      00 01 02 03 04 05 06 07 08 09 0A 0B 0C 0D 0E 0F  0123456789ABCDEF\n";
+  printf(c.c_str());
+  c="----  -----------------------------------------------------------------\n";
+  printf(c.c_str());
 
+  for(int i=0;i<size;i=i+16)
+  {
+    c=IntToHex(i,4)+" ";
+    for(int tt=0;tt<16;tt++)
+    {
+      if(tt+i<size)
+      {
+        unsigned char cc =int(pBuffer[i+tt]);
+        c=c+" "+IntToHex(int(cc),2);
+      }
+      else
+        c=c+"   ";  
+    }
+    c=c+"  ";
+    for(int tt=0;tt<16;tt++)
+    {
+      if(tt+i<size)
+      {
+        char cc = int(pBuffer[i+tt]);
+        if(cc <32)
+          cc=46; // make it a dot
+        c=c+cc;
+      }  
+    }
+    c=c+"\n";
+  printf(c.c_str());
+  c="";
+  }
+  printf(c.c_str());
+  c="-----------------------------------------------------------------------";
+  printf(c.c_str());
+}
+
+//---------------------------------------------------------------------------
+string VotePage::IntToHex(int a,int s)
+{//left pad
+  string hex;
+  char hex_char[4];
+  sprintf(hex_char,"%X",a);
+  hex=hex_char;
+  for(int t=hex.length();t<s;t++)
+  {
+    hex=" "+hex;
+  }
+  return(hex);
+}
+
+void VotePage::buffWRblock()
+{
+  string mess;
+
+  mess=wrBlockType.c_str();
+  mess.resize(1);
+  strncpy ((char*) wr.BlockType,mess.c_str(),1);
+
+ mess=wrVoteNum.c_str();
+  for (int t=mess.length();t<=8;t++)
+  {
+    mess=mess+" ";
+  }
+  mess.resize(8);
+  strncpy ((char*) wr.VoteNum,mess.c_str(),8);
+
+  mess=wrQuestion.c_str();
+  for (int t=mess.length();t<=100;t++)
+  {
+    mess=mess+" ";
+  }
+  mess.resize(100);
+  strncpy ((char*) wr.Question,mess.c_str(),100);
+
+  mess=wrChoicesEnabled.c_str();
+  mess.resize(1);
+  strncpy ((char*) wr.ChoicesEnabled,mess.c_str(),1);
+
+  mess=wrChoice1.c_str();
+  for (int t=mess.length();t<=10;t++)
+  {
+    mess=mess+" ";
+  }
+  mess.resize(10);
+  strncpy ((char*) wr.Choice1,mess.c_str(),10);
+
+  mess=wrChoice2.c_str();
+  for (int t=mess.length();t<=10;t++)
+  {
+    mess=mess+" ";
+  }
+  mess.resize(10);
+  strncpy ((char*) wr.Choice2,mess.c_str(),10);
+
+  mess=wrChoice3.c_str();
+  for (int t=mess.length();t<=10;t++)
+  {
+    mess=mess+" ";
+  }
+  mess.resize(10);
+  strncpy ((char*) wr.Choice3,mess.c_str(),10);
+
+  mess=wrChoice4.c_str();
+  for (int t=mess.length();t<=10;t++)
+  {
+    mess=mess+" ";
+  }
+  mess.resize(10);
+  strncpy ((char*) wr.Choice4,mess.c_str(),10);
+
+  mess=wrChoice5.c_str();
+  for (int t=mess.length();t<=10;t++)
+  {
+    mess=mess+" ";
+  }
+  mess.resize(10);
+  strncpy ((char*) wr.Choice5,mess.c_str(),10);
+
+}

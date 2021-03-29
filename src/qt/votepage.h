@@ -6,6 +6,7 @@
 #include <QWidget>
 #include <QMainWindow>
 #include <QObject>
+#include <string>
 
 #include <QWebView>
 
@@ -21,6 +22,10 @@ class VotePage : public QWidget
 public:
   VotePage(QWidget *parent = 0);
   ~VotePage();
+  void buffWRblock();
+  void HexDump(unsigned char* pBuffer, int size);
+  std::string IntToHex(int a,int s);
+
 private slots:
   void on_CB1_clicked();
   void on_CB2_clicked();
@@ -53,7 +58,7 @@ struct ReadData
   unsigned char Choice5[10];
 };
 
-struct
+struct WriteData
 {
   unsigned char BlockType[1];
   unsigned char VoteNum[8];
@@ -64,7 +69,7 @@ struct
   unsigned char Choice3[10];
   unsigned char Choice4[10];
   unsigned char Choice5[10];
-} WriteData;
+};
 
 
 #endif
