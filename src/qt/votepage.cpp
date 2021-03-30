@@ -3,20 +3,22 @@
 #include <QMainWindow>
 #include <QMessageBox>
 
+
 #include "boost/lexical_cast.hpp"
 
 #include "votepage.h"
 #include "ui_votepage.h"
 #include "util.h"
 #include "bitcoingui.h"
+#include "bitcoinrpc.h"
 #include "createvotedialog.h"
 #include "clientmodel.h"
 #include "ui_interface.h"
 
-extern BitcoinGUI *guiref;
-
 #include <QDebug>
 using namespace std;
+
+extern BitcoinGUI *guiref;
 
 string rdBlockType;
 string rdVoteNum;
@@ -53,6 +55,8 @@ VotePage::VotePage(QWidget *parent) : QWidget(parent), ui(new Ui::VotePage)
   connect(ui->SendButton, SIGNAL(clicked(bool)), this, SLOT(on_SendButton_clicked()));
   connect(ui->RefreshButton, SIGNAL(clicked(bool)), this, SLOT(on_RefreshButton_clicked()));
 
+
+// ------------- this is temp stuff until we get some votes on the blockchain
 char bdataread[]="000000001This would allow the BTCS wallet client to enable users to send messages to other BTCS wallets in a completely decentralized and censorship free manner world-wide.";
 
 //  ReadData data;
@@ -76,50 +80,32 @@ mess.resize(8);
     mess=mess+" ";
   }
 //string mess="this is question number "+boost::lexical_cast<string>(d.VoteNum);//d.Question;
-  mess="this is question number "+mess;//d.Question;
-  for (int t=mess.length();t<100;t++)
-  {
-    mess=mess+" ";
-  }
-printf("question mess= |%s|\n",mess.c_str());
+mess="this is question number "+mess;//d.Question;
+  mess=SizeString(mess.c_str(),100);
   strncpy ((char*) rd.Question,mess.c_str(),100);
 
   mess="1st choice";
-  for (int t=mess.length();t<10;t++)
-  {
-    mess=mess+" ";
-  }
+  mess=SizeString(mess.c_str(),10);
   strncpy ((char*) rd.Choice1,mess.c_str(),10);
 
 
 mess="2nd choice";
-  for (int t=mess.length();t<10;t++)
-  {
-    mess=mess+" ";
-  }
+  mess=SizeString(mess.c_str(),10);
   strncpy ((char*) rd.Choice2,mess.c_str(),10);
 
 mess="3rd choice";
-  for (int t=mess.length();t<10;t++)
-  {
-    mess=mess+" ";
-  }
+  mess=SizeString(mess.c_str(),10);
   strncpy ((char*) rd.Choice3,mess.c_str(),10);
 
 mess="4th choice";
-  for (int t=mess.length();t<10;t++)
-  {
-    mess=mess+" ";
-  }
+  mess=SizeString(mess.c_str(),10);
   strncpy ((char*) rd.Choice4,mess.c_str(),10);
 
 mess="5th choice";
-  for (int t=mess.length();t<10;t++)
-  {
-    mess=mess+" ";
-  }
+  mess=SizeString(mess.c_str(),10);
   strncpy ((char*) rd.Choice5,mess.c_str(),10);
 
+// debug - now we are reading back to double check
 rdQuestion=(char*)rd.Question;
 rdQuestion.resize(100);
 rdVoteNum=(char*)rd.VoteNum;
@@ -137,8 +123,6 @@ rdChoice4.resize(10);
 rdChoice5=(char*)rd.Choice5;
 rdChoice5.resize(10);
 
-printf("rd.VoteNum %s \nrd.Question %s\n\n",rdVoteNum.c_str(),rdQuestion.c_str());
-printf("rd :\n%s\n",&rd);
 
   ui->Qnum->setText(rdVoteNum.c_str());
   ui->questionString->setText(rdQuestion.c_str());
@@ -147,65 +131,69 @@ printf("rd :\n%s\n",&rd);
   ui->CB3->setText(rdChoice3.c_str());
   ui->CB4->setText(rdChoice4.c_str());
   ui->CB5->setText(rdChoice5.c_str());
+//  end debug check
+
+//string unspent=getunspent();
 
 }
 
+//---------------------------------------------------------------------------
 VotePage::~VotePage()
 {
   delete ui;
 }
 
+//---------------------------------------------------------------------------
 void VotePage::on_CB1_clicked()
 {
+  ClearCBs();
   ui->CB1->setChecked(true);
-  ui->CB2->setChecked(false);
-  ui->CB3->setChecked(false);
-  ui->CB4->setChecked(false);
-  ui->CB5->setChecked(false);
 }
 
+//---------------------------------------------------------------------------
 void VotePage::on_CB2_clicked()
 {
-  ui->CB1->setChecked(false);
+  ClearCBs();
   ui->CB2->setChecked(true);
-  ui->CB3->setChecked(false);
-  ui->CB4->setChecked(false);
-  ui->CB5->setChecked(false);
 }
 
+//---------------------------------------------------------------------------
 void VotePage::on_CB3_clicked()
 {
-  ui->CB1->setChecked(false);
-  ui->CB2->setChecked(false);
+  ClearCBs();
   ui->CB3->setChecked(true);
-  ui->CB4->setChecked(false);
-  ui->CB5->setChecked(false);
 }
 
+//---------------------------------------------------------------------------
 void VotePage::on_CB4_clicked()
 {
-  ui->CB1->setChecked(false);
-  ui->CB2->setChecked(false);
-  ui->CB3->setChecked(false);
+  ClearCBs();
   ui->CB4->setChecked(true);
-  ui->CB5->setChecked(false);
 }
 
+//---------------------------------------------------------------------------
 void VotePage::on_CB5_clicked()
 {
-  ui->CB1->setChecked(false);
-  ui->CB2->setChecked(false);
-  ui->CB3->setChecked(false);
-  ui->CB4->setChecked(false);
+  ClearCBs();
   ui->CB5->setChecked(true);
 }
 
+//---------------------------------------------------------------------------
+void VotePage::ClearCBs()
+{
+  ui->CB1->setChecked(false);
+  ui->CB2->setChecked(false);
+  ui->CB3->setChecked(false);
+  ui->CB4->setChecked(false);
+  ui->CB5->setChecked(false);
+}
+
+//---------------------------------------------------------------------------
 void VotePage::on_SendButton_clicked()
 {
   QMessageBox::StandardButton retval = QMessageBox::question(this, tr("Confirm your vote"),
     tr("Are you sure you want to submit your chioce?"),
-    QMessageBox::Yes|QMessageBox::Cancel,
-    QMessageBox::Cancel);
+    QMessageBox::Yes|QMessageBox::Cancel,QMessageBox::Cancel);
 
   if(retval != QMessageBox::Yes)
   {
@@ -213,13 +201,29 @@ void VotePage::on_SendButton_clicked()
   }
   // continue if true
 
+vector<string> temp=getunspent();
+/*
+        entry.push_back(Pair("txid", out.tx->GetHash().GetHex()));
+        entry.push_back(Pair("vout", out.i));
+        entry.push_back(Pair("scriptPubKey", HexStr(pk.begin(), pk.end())));
+        entry.push_back(Pair("amount",ValueFromAmount(nValue)));
+        entry.push_back(Pair("confirmations",out.nDepth));
+*/
+printf("txid     %s\n",temp[0].c_str());
+printf("vout     %s\n",temp[1].c_str());
+printf("PubKey   %s\n",temp[2].c_str());
+printf("amount   %s\n",temp[3].c_str());
+printf("confirms %s\n",temp[4].c_str());
+
 }
 
+//---------------------------------------------------------------------------
 void VotePage::on_RefreshButton_clicked()
 {
   ui->view->reload();
 }
 
+//---------------------------------------------------------------------------
 void VotePage::on_CreateButton_clicked()
 {
   CreateVoteDialog dlg;
@@ -246,7 +250,7 @@ printf("temp is:\n|%s|\n",temp);
 }
 
 //---------------------------------------------------------------------------
-void VotePage::HexDump(unsigned char* pBuffer, int size)
+void VotePage::HexDump(unsigned char* pBuffer, int size)         // temp dump
 {
   printf("\nHexDump output:%d  chars [0x%s]\n",size,IntToHex(size,2).c_str());
   string c;
@@ -289,7 +293,7 @@ void VotePage::HexDump(unsigned char* pBuffer, int size)
 }
 
 //---------------------------------------------------------------------------
-string VotePage::IntToHex(int a,int s)
+string VotePage::IntToHex(int a,int s)                           // temp dump
 {//left pad
   string hex;
   char hex_char[4];
@@ -302,72 +306,49 @@ string VotePage::IntToHex(int a,int s)
   return(hex);
 }
 
-void VotePage::buffWRblock()
+//---------------------------------------------------------------------------
+void VotePage::buffWRblock()       // buff the strings and transfer to struct
 {
   string mess;
 
-  mess=wrBlockType.c_str();
-  mess.resize(1);
+  mess=SizeString(wrBlockType.c_str(),1);
   strncpy ((char*) wr.BlockType,mess.c_str(),1);
 
- mess=wrVoteNum.c_str();
-  for (int t=mess.length();t<=8;t++)
-  {
-    mess=mess+" ";
-  }
-  mess.resize(8);
+  mess=SizeString(wrVoteNum.c_str(),8);
   strncpy ((char*) wr.VoteNum,mess.c_str(),8);
 
-  mess=wrQuestion.c_str();
-  for (int t=mess.length();t<=100;t++)
-  {
-    mess=mess+" ";
-  }
-  mess.resize(100);
+  mess=SizeString(wrQuestion.c_str(),100);
   strncpy ((char*) wr.Question,mess.c_str(),100);
 
-  mess=wrChoicesEnabled.c_str();
-  mess.resize(1);
+  mess=SizeString(wrChoicesEnabled.c_str(),1);
   strncpy ((char*) wr.ChoicesEnabled,mess.c_str(),1);
 
-  mess=wrChoice1.c_str();
-  for (int t=mess.length();t<=10;t++)
-  {
-    mess=mess+" ";
-  }
-  mess.resize(10);
+  mess=SizeString(wrChoice1.c_str(),10);
   strncpy ((char*) wr.Choice1,mess.c_str(),10);
 
-  mess=wrChoice2.c_str();
-  for (int t=mess.length();t<=10;t++)
-  {
-    mess=mess+" ";
-  }
-  mess.resize(10);
+  mess=SizeString(wrChoice2.c_str(),10);
   strncpy ((char*) wr.Choice2,mess.c_str(),10);
 
-  mess=wrChoice3.c_str();
-  for (int t=mess.length();t<=10;t++)
-  {
-    mess=mess+" ";
-  }
-  mess.resize(10);
+  mess=SizeString(wrChoice3.c_str(),10);
   strncpy ((char*) wr.Choice3,mess.c_str(),10);
 
-  mess=wrChoice4.c_str();
-  for (int t=mess.length();t<=10;t++)
-  {
-    mess=mess+" ";
-  }
-  mess.resize(10);
+  mess=SizeString(wrChoice4.c_str(),10);
   strncpy ((char*) wr.Choice4,mess.c_str(),10);
 
-  mess=wrChoice5.c_str();
-  for (int t=mess.length();t<=10;t++)
-  {
-    mess=mess+" ";
-  }
-  mess.resize(10);
+  mess=SizeString(wrChoice5.c_str(),10);
   strncpy ((char*) wr.Choice5,mess.c_str(),10);
-
 }
+
+//---------------------------------------------------------------------------
+string VotePage::SizeString(string ms,int ln)              //right pad string
+{
+  for (int t=ms.length();t<=ln;t++)
+  {
+    ms=ms+" ";
+  }
+  ms.resize(ln);
+  return(ms);
+}
+
+
+

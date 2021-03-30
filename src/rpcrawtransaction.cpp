@@ -6,6 +6,7 @@
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
 #include <boost/assign/list_of.hpp>
+#include "boost/lexical_cast.hpp"
 
 #include "base58.h"
 #include "bitcoinrpc.h"
@@ -186,6 +187,35 @@ Value listunspent(const Array& params, bool fHelp)
 
     return results;
 }
+
+std::vector<std::string> getunspent()
+{
+    int nMinDepth = 120;
+    int nMaxDepth = 999999;
+
+    vector<std::string> results;
+    vector<COutput> vecOutputs;
+    pwalletMain->AvailableCoins(vecOutputs, false);
+    BOOST_FOREACH(const COutput& out, vecOutputs)
+    {
+        if (out.nDepth < nMinDepth || out.nDepth > nMaxDepth)
+            continue;
+
+        int64 nValue = out.tx->vout[out.i].nValue/100000000;
+
+//        if(nValue >1) // need at least one coin to vote
+//          continue;
+        const CScript& pk = out.tx->vout[out.i].scriptPubKey;
+        results.push_back(out.tx->GetHash().GetHex());
+        results.push_back(boost::lexical_cast<string>(out.i));
+        results.push_back(HexStr(pk.begin(), pk.end()));
+        results.push_back(boost::lexical_cast<string>(nValue));
+        results.push_back(boost::lexical_cast<string>(out.nDepth));
+        return results;
+    }
+    return results; //should return error
+}
+
 
 //std::vector<unsigned char> ParseHexV(const UniValue& v, std::string strName)
 //{

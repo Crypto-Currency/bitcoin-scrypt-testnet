@@ -24,7 +24,9 @@ public:
   ~VotePage();
   void buffWRblock();
   void HexDump(unsigned char* pBuffer, int size);
+  void ClearCBs();
   std::string IntToHex(int a,int s);
+  std::string SizeString(std::string ms,int ln);
 
 private slots:
   void on_CB1_clicked();
@@ -71,5 +73,11 @@ struct WriteData
   unsigned char Choice5[10];
 };
 
+struct VoteData
+{
+  char BlockType[1];
+  char VoteNum[8];
+  char Vote[1];
+};
 
 #endif
