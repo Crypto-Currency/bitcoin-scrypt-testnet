@@ -10,6 +10,7 @@
 
 #include <QWebView>
 
+ 
 namespace Ui
 {
   class VotePage;

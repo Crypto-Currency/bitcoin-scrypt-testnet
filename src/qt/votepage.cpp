@@ -5,7 +5,7 @@
 
 
 #include "boost/lexical_cast.hpp"
-
+#include <json_spirit.h>
 #include "votepage.h"
 #include "ui_votepage.h"
 #include "util.h"
@@ -14,11 +14,14 @@
 #include "createvotedialog.h"
 #include "clientmodel.h"
 #include "ui_interface.h"
+#include "rpcconsole.h"
 
 #include <QDebug>
 using namespace std;
+using namespace json_spirit;
 
 extern BitcoinGUI *guiref;
+extern Value createrawtransaction(const Array& params, bool fHelp);
 
 string rdBlockType;
 string rdVoteNum;
@@ -52,7 +55,6 @@ VotePage::VotePage(QWidget *parent) : QWidget(parent), ui(new Ui::VotePage)
   connect(ui->CB3, SIGNAL(clicked(bool)), this, SLOT(on_CB3_clicked()));
   connect(ui->CB4, SIGNAL(clicked(bool)), this, SLOT(on_CB4_clicked()));
   connect(ui->CB5, SIGNAL(clicked(bool)), this, SLOT(on_CB5_clicked()));
-  connect(ui->SendButton, SIGNAL(clicked(bool)), this, SLOT(on_SendButton_clicked()));
   connect(ui->RefreshButton, SIGNAL(clicked(bool)), this, SLOT(on_RefreshButton_clicked()));
 
 
@@ -133,8 +135,6 @@ rdChoice5.resize(10);
   ui->CB5->setText(rdChoice5.c_str());
 //  end debug check
 
-//string unspent=getunspent();
-
 }
 
 //---------------------------------------------------------------------------
@@ -196,12 +196,14 @@ void VotePage::on_SendButton_clicked()
     QMessageBox::Yes|QMessageBox::Cancel,QMessageBox::Cancel);
 
   if(retval != QMessageBox::Yes)
+//  if(ret != QMessageBox::Yes)
   {
     return;
   }
+  
   // continue if true
 
-vector<string> temp=getunspent();
+  vector<string> temp=getunspent();
 /*
         entry.push_back(Pair("txid", out.tx->GetHash().GetHex()));
         entry.push_back(Pair("vout", out.i));
@@ -209,12 +211,64 @@ vector<string> temp=getunspent();
         entry.push_back(Pair("amount",ValueFromAmount(nValue)));
         entry.push_back(Pair("confirmations",out.nDepth));
 */
-printf("txid     %s\n",temp[0].c_str());
-printf("vout     %s\n",temp[1].c_str());
-printf("PubKey   %s\n",temp[2].c_str());
-printf("amount   %s\n",temp[3].c_str());
-printf("confirms %s\n",temp[4].c_str());
+  if(temp.size() ==1)
+  {// known error
 
+    printf("error  %s\n",temp[0].c_str());
+    printf("length %d\n",temp.size());
+    uiInterface.ThreadSafeMessageBox(
+      strprintf(_("Vote cast:\n"
+                  "error %s\n"), temp[0].c_str()),
+                _("Error"), CClientUIInterface::OK | CClientUIInterface::MODAL);
+   }
+  else
+  if(temp.size() ==5)
+  {
+    string sValue=temp[3];
+    sValue.insert(sValue.length()-8,".");
+    double dvalue = boost::lexical_cast<double>(sValue.c_str());
+//cout <<"dvalue "<<dvalue<<"\n";
+
+    printf("txid     %s\n",temp[0].c_str());
+    printf("vout     %s\n",temp[1].c_str());
+    printf("PubKey   %s\n",temp[2].c_str());
+    printf("amount   %s\n",temp[3].c_str());
+    printf("svalue   %s\n",sValue.c_str());
+    printf("dvalue   %f\n",dvalue);
+    printf("confirms %s\n",temp[4].c_str());
+
+    double change=dvalue-1;  //cost 1 coint to vote
+cout <<"change "<<change<<"\n";
+
+// build array
+//    const Array& params;
+string message="test message 03/30/2021";
+string address="mtRwEyanMyBdgHeTCUPyhQgMaaFmjYLk3N";
+    Array param1;
+    Array param2;
+    Object obj1;
+    Object obj2;
+
+    int vout=boost::lexical_cast<int>(temp[1]);
+    obj1.push_back(Pair("txid",temp[0]));
+    obj1.push_back(Pair("vout",vout));
+    param1.push_back(obj1);
+
+    obj2.push_back(Pair("data",message));
+    obj2.push_back(Pair(address,change));
+
+    param2.push_back(param1);
+    param2.push_back(obj2);
+    Value createraw=createrawtransaction(param2,false);
+    cout << json_spirit::write(createraw) <<"\n";
+
+  }
+  else
+  {
+    printf("unknown error  %s\n",temp[0].c_str());
+    printf("vector length  %d\n",temp.size());
+  }
+  return;
 }
 
 //---------------------------------------------------------------------------

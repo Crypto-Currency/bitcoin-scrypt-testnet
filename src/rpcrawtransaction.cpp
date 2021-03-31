@@ -7,6 +7,7 @@
 
 #include <boost/assign/list_of.hpp>
 #include "boost/lexical_cast.hpp"
+#include <json_spirit.h>
 
 #include "base58.h"
 #include "bitcoinrpc.h"
@@ -192,7 +193,6 @@ std::vector<std::string> getunspent()
 {
     int nMinDepth = 120;
     int nMaxDepth = 999999;
-
     vector<std::string> results;
     vector<COutput> vecOutputs;
     pwalletMain->AvailableCoins(vecOutputs, false);
@@ -201,19 +201,23 @@ std::vector<std::string> getunspent()
         if (out.nDepth < nMinDepth || out.nDepth > nMaxDepth)
             continue;
 
+        // convert to coins (10 ='1000000000')
         int64 nValue = out.tx->vout[out.i].nValue/100000000;
 
-//        if(nValue >1) // need at least one coin to vote
-//          continue;
+        if(nValue < 1) // need at least one coin to vote
+          continue;
+
         const CScript& pk = out.tx->vout[out.i].scriptPubKey;
         results.push_back(out.tx->GetHash().GetHex());
         results.push_back(boost::lexical_cast<string>(out.i));
         results.push_back(HexStr(pk.begin(), pk.end()));
-        results.push_back(boost::lexical_cast<string>(nValue));
+        // return the full amount including after decimal)
+        results.push_back(boost::lexical_cast<string>(out.tx->vout[out.i].nValue));
         results.push_back(boost::lexical_cast<string>(out.nDepth));
         return results;
     }
-    return results; //should return error
+    results.push_back("Could not find a spendable coin.\nYou need at least 1 BTCS to vote,\nor there could be a problem with your wallet");
+//    return results; //should return error
 }
 
 
@@ -243,16 +247,13 @@ Value createrawtransaction(const Array& params, bool fHelp)
   RPCTypeCheck(params, list_of(array_type)(obj_type));
   if (params[0].is_null() || params[1].is_null())
     throw JSONRPCError(RPC_INVALID_PARAMETER, "Invalid parameter, arguments 1 and 2 must be non-null");
-
   Array inputs = params[0].get_array();
   Object sendTo = params[1].get_obj();
-
   CTransaction rawTx;
 
   BOOST_FOREACH(Value& input, inputs)
   {
     const Object& o = input.get_obj();
-
     const Value& txid_v = find_value(o, "txid");
     if (txid_v.type() != str_type)
       throw JSONRPCError(-8, "Invalid parameter, missing txid key");
