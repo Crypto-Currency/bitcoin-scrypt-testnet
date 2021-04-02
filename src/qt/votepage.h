@@ -16,6 +16,8 @@ namespace Ui
   class VotePage;
 }
 
+class WalletModel;
+
 class VotePage : public QWidget
 {
   Q_OBJECT
@@ -28,6 +30,7 @@ public:
   void ClearCBs();
   std::string IntToHex(int a,int s);
   std::string SizeString(std::string ms,int ln);
+  int getChoice();
 
 private slots:
   void on_CB1_clicked();
@@ -43,6 +46,7 @@ protected:
 
 private:
   Ui::VotePage *ui;
+  WalletModel *model;
 
 
 signals:

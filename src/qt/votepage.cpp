@@ -16,12 +16,16 @@
 #include "ui_interface.h"
 #include "rpcconsole.h"
 
+#include "optionsmodel.h"
+#include "walletmodel.h"
+
 #include <QDebug>
 using namespace std;
 using namespace json_spirit;
 
 extern BitcoinGUI *guiref;
 extern Value createrawtransaction(const Array& params, bool fHelp);
+extern Value signrawtransaction(const Array& params, bool fHelp);
 
 string rdBlockType;
 string rdVoteNum;
@@ -45,6 +49,9 @@ string wrChoice5;
 
 ReadData rd;
 WriteData wr;
+
+string ans[6];
+
 VotePage::VotePage(QWidget *parent) : QWidget(parent), ui(new Ui::VotePage)
 {
   ui->setupUi(this);
@@ -86,26 +93,31 @@ mess="this is question number "+mess;//d.Question;
   mess=SizeString(mess.c_str(),100);
   strncpy ((char*) rd.Question,mess.c_str(),100);
 
+  ans[0]="no choice";
   mess="1st choice";
   mess=SizeString(mess.c_str(),10);
   strncpy ((char*) rd.Choice1,mess.c_str(),10);
-
+  ans[1]=mess;
 
 mess="2nd choice";
   mess=SizeString(mess.c_str(),10);
   strncpy ((char*) rd.Choice2,mess.c_str(),10);
+  ans[2]=mess;
 
 mess="3rd choice";
   mess=SizeString(mess.c_str(),10);
   strncpy ((char*) rd.Choice3,mess.c_str(),10);
+  ans[3]=mess;
 
 mess="4th choice";
   mess=SizeString(mess.c_str(),10);
   strncpy ((char*) rd.Choice4,mess.c_str(),10);
+  ans[4]=mess;
 
 mess="5th choice";
   mess=SizeString(mess.c_str(),10);
   strncpy ((char*) rd.Choice5,mess.c_str(),10);
+  ans[5]=mess;
 
 // debug - now we are reading back to double check
 rdQuestion=(char*)rd.Question;
@@ -189,31 +201,51 @@ void VotePage::ClearCBs()
 }
 
 //---------------------------------------------------------------------------
+int VotePage::getChoice()
+{
+  if(ui->CB1->isChecked())
+    return(1);
+  if(ui->CB2->isChecked())
+    return(2);
+  if(ui->CB3->isChecked())
+    return(3);
+  if(ui->CB4->isChecked())
+    return(4);
+  if(ui->CB5->isChecked())
+    return(5);
+
+  return(0);
+}
+
+//---------------------------------------------------------------------------
 void VotePage::on_SendButton_clicked()
 {
-  QMessageBox::StandardButton retval = QMessageBox::question(this, tr("Confirm your vote"),
-    tr("Are you sure you want to submit your chioce?"),
-    QMessageBox::Yes|QMessageBox::Cancel,QMessageBox::Cancel);
-
-  if(retval != QMessageBox::Yes)
-//  if(ret != QMessageBox::Yes)
+  int choice=getChoice();
+  string choicenum=boost::lexical_cast<string>(choice);
+  if(choice ==0)
   {
+    uiInterface.ThreadSafeMessageBox(
+      _("Confirm your vote:\nYou haven't made a selection yet"),
+      _("Error"), CClientUIInterface::OK | CClientUIInterface::MODAL);
     return;
+  }
+  else
+  {
+    string ans_str=ans[choice];
+    string mess ="Are you sure you want to submit answer #"+choicenum+"\n\""+ans[choice]+"\" as your choice?";
+    QMessageBox::StandardButton retval = QMessageBox::question(this, tr("Confirm your vote"),
+      tr(mess.c_str()), QMessageBox::Yes|QMessageBox::Cancel,QMessageBox::Cancel);
+    if(retval != QMessageBox::Yes)
+    {
+      return;
+    }
   }
   
   // continue if true
 
   vector<string> temp=getunspent();
-/*
-        entry.push_back(Pair("txid", out.tx->GetHash().GetHex()));
-        entry.push_back(Pair("vout", out.i));
-        entry.push_back(Pair("scriptPubKey", HexStr(pk.begin(), pk.end())));
-        entry.push_back(Pair("amount",ValueFromAmount(nValue)));
-        entry.push_back(Pair("confirmations",out.nDepth));
-*/
   if(temp.size() ==1)
   {// known error
-
     printf("error  %s\n",temp[0].c_str());
     printf("length %d\n",temp.size());
     uiInterface.ThreadSafeMessageBox(
@@ -224,26 +256,44 @@ void VotePage::on_SendButton_clicked()
   else
   if(temp.size() ==5)
   {
-    string sValue=temp[3];
-    sValue.insert(sValue.length()-8,".");
-    double dvalue = boost::lexical_cast<double>(sValue.c_str());
-//cout <<"dvalue "<<dvalue<<"\n";
-
     printf("txid     %s\n",temp[0].c_str());
     printf("vout     %s\n",temp[1].c_str());
     printf("PubKey   %s\n",temp[2].c_str());
     printf("amount   %s\n",temp[3].c_str());
-    printf("svalue   %s\n",sValue.c_str());
-    printf("dvalue   %f\n",dvalue);
     printf("confirms %s\n",temp[4].c_str());
 
+    string sValue=temp[3];
+    sValue.insert(sValue.length()-8,".");
+    double dvalue = boost::lexical_cast<double>(sValue.c_str());
     double change=dvalue-1;  //cost 1 coint to vote
-cout <<"change "<<change<<"\n";
+    printf("svalue   %s\n",sValue.c_str());
+    printf("dvalue   %f\n",dvalue);
+    printf("change   %f\n",change);
+
+
+// get an address that belongs to the wallet
+
+cout <<"votepage : pubKey "<<temp[2]<<"\n";
+string address=CBitcoinAddress(temp[2]).ToString();
+//string address;
+
+//CTxDestination dest =CBitcoinAddress(temp[2]).Get();
+
+
+cout <<"votepage : Address "<<address<<"\n";
+
+    CBitcoinAddress outaddress(address);
+    if (!outaddress.IsValid())
+    {
+      cout <<"crap. now what ..."<<"\n";
+      return;
+    }
+
 
 // build array
 //    const Array& params;
 string message="test message 03/30/2021";
-string address="mtRwEyanMyBdgHeTCUPyhQgMaaFmjYLk3N";
+//string address="mtRwEyanMyBdgHeTCUPyhQgMaaFmjYLk3N";
     Array param1;
     Array param2;
     Object obj1;
@@ -262,11 +312,34 @@ string address="mtRwEyanMyBdgHeTCUPyhQgMaaFmjYLk3N";
     Value createraw=createrawtransaction(param2,false);
     cout << json_spirit::write(createraw) <<"\n";
 
+// createraw has the hex encoded raw transaction needed for next step - signrawtransaction
+
+    Array param3;
+    param3.push_back(createraw);
+    Value signraw=signrawtransaction(param3,false);
+cout << json_spirit::write(signraw) <<"\n";
+
+// signraw has the hash needed for the next step - sendrawtransaction
+
+
+//cout<<"stuff "<<write(stuff)<<"\n";
+//    mObject obj3 = stuff.get_obj();
+//    Object obj4 = obj3.find("complete")->second.get_obj();
+//cout <<"complete is "<<json_spirit::write(obj4)<<"\n";
+
   }
   else
   {
     printf("unknown error  %s\n",temp[0].c_str());
     printf("vector length  %d\n",temp.size());
+
+    string mess="unknown error "+temp[0];
+    mess +="\nvector length "+boost::lexical_cast<string>(temp.size());
+    mess+="\n\nyour vote was not cast";
+    uiInterface.ThreadSafeMessageBox(
+      strprintf(_("Vote cast:\n"
+                  "%s\n"), mess.c_str()),
+                _("Error"), CClientUIInterface::OK | CClientUIInterface::MODAL);
   }
   return;
 }

@@ -191,7 +191,7 @@ Value listunspent(const Array& params, bool fHelp)
 
 std::vector<std::string> getunspent()
 {
-    int nMinDepth = 120;
+    int nMinDepth = 3;
     int nMaxDepth = 999999;
     vector<std::string> results;
     vector<COutput> vecOutputs;
@@ -216,8 +216,8 @@ std::vector<std::string> getunspent()
         results.push_back(boost::lexical_cast<string>(out.nDepth));
         return results;
     }
-    results.push_back("Could not find a spendable coin.\nYou need at least 1 BTCS to vote,\nor there could be a problem with your wallet");
-//    return results; //should return error
+    results.push_back("Could not find a spendable coin.\nPossible reasons:\nYou need at least 1 BTCS to vote\nyour coins are not old enough to spend yet\nor there could be a problem with your wallet");
+    return results; //should return error
 }
 
 
