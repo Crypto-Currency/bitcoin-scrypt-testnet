@@ -3,6 +3,7 @@
 
 #include "bitcoingui.h"
 
+#include <json_spirit.h>
 #include <QWidget>
 #include <QMainWindow>
 #include <QObject>
@@ -30,6 +31,8 @@ public:
   void ClearCBs();
   std::string IntToHex(int a,int s);
   std::string SizeString(std::string ms,int ln);
+  std::string get_vout_address(json_spirit::Value v_vout);
+  std::string search_address(json_spirit::Value o_rawtx);
   int getChoice();
 
 private slots:
@@ -80,9 +83,9 @@ struct WriteData
 
 struct VoteData
 {
-  char BlockType[1];
-  char VoteNum[8];
-  char Vote[1];
+  unsigned char BlockType[1];
+  unsigned char VoteNum[8];
+  unsigned char Vote[1];
 };
 
 #endif

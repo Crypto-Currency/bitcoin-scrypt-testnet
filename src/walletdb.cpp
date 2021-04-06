@@ -193,7 +193,6 @@ ReadKeyValue(CWallet* pwallet, CDataStream& ssKey, CDataStream& ssValue,
         // Taking advantage of the fact that pair serialization
         // is just the two items serialized one after the other
         ssKey >> strType;
-//printf("ReadKeyValue:  strtype =%s\n", strType.c_str());
         if (strType == "name")
         {
             string strAddress;

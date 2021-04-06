@@ -26,6 +26,9 @@ using namespace json_spirit;
 extern BitcoinGUI *guiref;
 extern Value createrawtransaction(const Array& params, bool fHelp);
 extern Value signrawtransaction(const Array& params, bool fHelp);
+extern Value listunspent(const Array& params, bool fHelp);
+extern Value getrawtransaction(const Array& params, bool fHelp);
+extern Value sendrawtransaction(const Array& params, bool fHelp);
 
 string rdBlockType;
 string rdVoteNum;
@@ -244,6 +247,7 @@ void VotePage::on_SendButton_clicked()
   // continue if true
 
   vector<string> temp=getunspent();
+
   if(temp.size() ==1)
   {// known error
     printf("error  %s\n",temp[0].c_str());
@@ -271,62 +275,112 @@ void VotePage::on_SendButton_clicked()
     printf("change   %f\n",change);
 
 
+// ---------------------------------------------------------------------------------------
 // get an address that belongs to the wallet
 
-cout <<"votepage : pubKey "<<temp[2]<<"\n";
-string address=CBitcoinAddress(temp[2]).ToString();
-//string address;
-
-//CTxDestination dest =CBitcoinAddress(temp[2]).Get();
+    Value rawtx=getraw(temp[0]);
+    Object o_rawtx=rawtx.get_obj();
+cout <<"o_rawtx.size() "<<o_rawtx.size()<<"\n";
+    string address=search_address(rawtx);
 
 
 cout <<"votepage : Address "<<address<<"\n";
 
+//cout<<"calling CBitcoinaddress\n";
     CBitcoinAddress outaddress(address);
     if (!outaddress.IsValid())
     {
       cout <<"crap. now what ..."<<"\n";
       return;
     }
-
+//cout<<"cb addrs passed\n";
 
 // build array
-//    const Array& params;
-string message="test message 03/30/2021";
-//string address="mtRwEyanMyBdgHeTCUPyhQgMaaFmjYLk3N";
+    VoteData vd;
+    vd.BlockType[0]=3;//rd.BlockType[0];
+//vd.VoteNum=rd.VoteNum
+    strncpy ((char*) vd.VoteNum,rdVoteNum.c_str(),8);
+    vd.Vote[0]=boost::lexical_cast<unsigned char>(choice);
+
+unsigned char vtemp[10];
+//mess=boost::lexical_cast<string>(wr.BlockType); // yes, nasty
+    memcpy(vtemp,&vd,10);
+//debug
+printf("\nstart dump:\n");
+HexDump(vtemp,10); 
+printf("\nend dump\n\n");
+printf("vtemp is:\n|%s|\n",vtemp);
+
+
+
+//return; for debugging to here
+//    string message="test message April 5, 2021";
+string message=boost::lexical_cast<string>(vtemp);
+cout<<"send message : "<<message <<"\n";
+
     Array param1;
     Array param2;
     Object obj1;
     Object obj2;
-
     int vout=boost::lexical_cast<int>(temp[1]);
     obj1.push_back(Pair("txid",temp[0]));
     obj1.push_back(Pair("vout",vout));
     param1.push_back(obj1);
+    param2.push_back(param1);
 
     obj2.push_back(Pair("data",message));
+//    obj2.push_back(Pair("data",vtemp));
     obj2.push_back(Pair(address,change));
-
-    param2.push_back(param1);
     param2.push_back(obj2);
-    Value createraw=createrawtransaction(param2,false);
-    cout << json_spirit::write(createraw) <<"\n";
 
+//cout<<"\ncalling createrawtransaction\n";
+    Value createraw=createrawtransaction(param2,false);
+cout <<"from createrawtransaction:\n"<< json_spirit::write(createraw) <<"\n";
+
+// ---------------------------------------------------------------------------------------
 // createraw has the hex encoded raw transaction needed for next step - signrawtransaction
 
     Array param3;
     param3.push_back(createraw);
+//cout<<"\ncalling signrawtransaction\n";
     Value signraw=signrawtransaction(param3,false);
-cout << json_spirit::write(signraw) <<"\n";
+cout <<"from signrawtransaction:\n"<< json_spirit::write(signraw) <<"\n";
 
 // signraw has the hash needed for the next step - sendrawtransaction
 
+//    mObject o_signed = signraw.get_obj();
+Object o_signed = signraw.get_obj();
+cout <<"o_signed is "<<json_spirit::write(o_signed)<<"\n";
 
-//cout<<"stuff "<<write(stuff)<<"\n";
-//    mObject obj3 = stuff.get_obj();
-//    Object obj4 = obj3.find("complete")->second.get_obj();
-//cout <<"complete is "<<json_spirit::write(obj4)<<"\n";
+    string s_sendhex;
+    bool complete=false;
+    BOOST_FOREACH(const Pair& sn, o_signed)
+    {
+      if(sn.name_ == "hex")
+      {
+        s_sendhex=sn.value_.get_str();
+cout<<"sendhex "<<s_sendhex<<"\n";
+      }
+      if(sn.name_ == "complete")
+      {
+        complete=sn.value_.get_bool();
+cout<<"sn.value_ "<<complete<<"\n";
+      }
+    }
 
+    if(complete)
+    { 
+//      param.push_back(o_signed);
+    Array a_send;
+    a_send.push_back(s_sendhex);
+//cout<<"\ncalling sendrawtransation\n";
+    Value sent=sendrawtransaction(a_send,false);
+//    Value sent=sendrawtransaction(o_signed,false);
+
+cout <<"from sendrawtransaction:\n"<< json_spirit::write(sent) <<"\n";
+
+
+    }
   }
   else
   {
@@ -345,6 +399,97 @@ cout << json_spirit::write(signraw) <<"\n";
 }
 
 //---------------------------------------------------------------------------
+string VotePage::get_vout_address(Value v_vout)
+{
+  Array a_vout=v_vout.get_array();
+  int sz=a_vout.size(); // we will use the last input
+//cout<<"sz "<<boost::lexical_cast<string>(sz);
+  Object o_out = a_vout[sz-1].get_obj();
+//cout<<"o_out "<< json_spirit::write(o_out) <<"\n";
+  BOOST_FOREACH(const Pair& ss, o_out)
+  {
+//cout<<"ss.name "<<ss.name_<<"\n";
+    if(ss.name_ == "scriptPubKey")
+    {
+      Object o_addr=ss.value_.get_obj();
+      BOOST_FOREACH(const Pair& sss, o_addr)
+      {
+        if(sss.name_ == "addresses")
+        {
+          int adds_size=sss.value_.get_array().size();
+          Array a_adds=sss.value_.get_array();
+          string address=a_adds[0].get_str();
+          return address;
+        }
+      }
+    }// endif scriptPubKey
+    else
+    {
+//cout<<" scriptPubKey is false\n\n";
+    }
+  }
+  return "false";
+}
+
+//---------------------------------------------------------------------------
+string VotePage::search_address(Value rawtx)
+{
+  Object o_rawtx=rawtx.get_obj();
+  Object o_vin;
+  Object o_vout;
+  Array a_vin;
+  Array a_vout;
+  string address;
+  bool b_coinbase=false;
+  BOOST_FOREACH(const Pair& s, o_rawtx)
+  {
+    if(s.name_ == "vin")
+    {
+cout<<"\nlooking at vin\n";
+      a_vin=s.value_.get_array();
+      Object o_in = a_vin[0].get_obj();
+      BOOST_FOREACH(const Pair& ss, o_in)
+      {
+        if(ss.name_ == "coinbase")
+        {
+cout<<"vin : is coinbase\n";
+          b_coinbase=true;
+        }
+        if(ss.name_ == "txid")
+        {
+cout<<"vin : is txid\n";
+          string s_vin=ss.value_.get_str();
+cout<<"vin : txid "<<s_vin<<"\n";
+          Value vin_rawtx=getraw(s_vin);
+          Object o_vin_rawtx=vin_rawtx.get_obj();
+
+cout <<"o_vin_rawtx.size() "<<o_vin_rawtx.size()<<"\n";
+          BOOST_FOREACH(const Pair& s_vin, o_vin_rawtx)
+          {
+            if(s_vin.name_ == "vout")
+            {
+              Array a_vin_vout=s_vin.value_.get_array();
+              string vin_address=get_vout_address(s_vin.value_);
+cout<<"vin_address "<<vin_address<<"\n";
+              return vin_address;
+            }
+          }
+        }
+cout<<"vin pair ss.name "<<ss.name_<<"\n";
+      }
+    }
+
+    if(s.name_ == "vout")
+    {
+      a_vout=s.value_.get_array();
+      string vout_address=get_vout_address(s.value_);
+cout<<"vout_address "<<vout_address<<"\n";
+      return vout_address;
+    }
+  }
+}
+
+//---------------------------------------------------------------------------
 void VotePage::on_RefreshButton_clicked()
 {
   ui->view->reload();
@@ -357,17 +502,20 @@ void VotePage::on_CreateButton_clicked()
   if (dlg.exec() == QDialog::Accepted)
   {
     buffWRblock();  // add spaces to fill
-
-    string mess;
-unsigned char temp[160];
-//mess=boost::lexical_cast<string>(wr.BlockType); // yes, nasty
-  memcpy(temp,&wr,160);
+    unsigned char send_temp[160];
+    memcpy(send_temp,&wr,160);
 
 //debug
 printf("\nstart dump:\n");
-HexDump(temp,160); 
+HexDump(send_temp,160); 
 printf("\nend dump\n\n");
-printf("temp is:\n|%s|\n",temp);
+printf("temp is:\n|%s|\n",send_temp);
+
+
+
+
+
+
   }
   else
   {

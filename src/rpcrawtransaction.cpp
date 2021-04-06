@@ -7,7 +7,7 @@
 
 #include <boost/assign/list_of.hpp>
 #include "boost/lexical_cast.hpp"
-#include <json_spirit.h>
+//#include <json_spirit.h>
 
 #include "base58.h"
 #include "bitcoinrpc.h"
@@ -112,6 +112,21 @@ TxToJSON(const CTransaction& tx, const uint256 hashBlock, Object& entry)
     }
 }
 
+Object getraw(string txid)
+{
+    uint256 hash;
+    hash.SetHex(txid);
+
+    CTransaction tx;
+    uint256 hashBlock = 0;
+    if (!GetTransaction(hash, tx, hashBlock))
+        throw JSONRPCError(-5, "No information available about transaction");
+
+    Object result;
+    TxToJSON(tx, hashBlock, result);
+    return result;
+}
+
 Value getrawtransaction(const Array& params, bool fHelp)
 {
     if (fHelp || params.size() < 1 || params.size() > 2)
@@ -121,6 +136,7 @@ Value getrawtransaction(const Array& params, bool fHelp)
             "serialized, hex-encoded data for <txid>.\n"
             "If verbose is non-zero, returns an Object\n"
             "with information about <txid>.");
+
 
     uint256 hash;
     hash.SetHex(params[0].get_str());
@@ -167,6 +183,7 @@ Value listunspent(const Array& params, bool fHelp)
     if (params.size() > 1)
         nMaxDepth = params[1].get_int();
 
+    set<CBitcoinAddress> setAddress;//test
     Array results;
     vector<COutput> vecOutputs;
     pwalletMain->AvailableCoins(vecOutputs, false);
@@ -175,6 +192,17 @@ Value listunspent(const Array& params, bool fHelp)
         if (out.nDepth < nMinDepth || out.nDepth > nMaxDepth)
             continue;
 
+// test start
+        if(setAddress.size())
+        {
+            CTxDestination address;
+            if(!ExtractDestination(out.tx->vout[out.i].scriptPubKey, address))
+                continue;
+
+            if (!setAddress.count(address))
+                continue;
+        }
+// test stop
         int64 nValue = out.tx->vout[out.i].nValue;
         const CScript& pk = out.tx->vout[out.i].scriptPubKey;
         Object entry;
@@ -191,7 +219,7 @@ Value listunspent(const Array& params, bool fHelp)
 
 std::vector<std::string> getunspent()
 {
-    int nMinDepth = 3;
+    int nMinDepth = 115;
     int nMaxDepth = 999999;
     vector<std::string> results;
     vector<COutput> vecOutputs;
@@ -246,7 +274,10 @@ Value createrawtransaction(const Array& params, bool fHelp)
 
   RPCTypeCheck(params, list_of(array_type)(obj_type));
   if (params[0].is_null() || params[1].is_null())
+  {
+    printf("Invalid parameter, arguments 1 and 2 must be non-null\n");
     throw JSONRPCError(RPC_INVALID_PARAMETER, "Invalid parameter, arguments 1 and 2 must be non-null");
+  }
   Array inputs = params[0].get_array();
   Object sendTo = params[1].get_obj();
   CTransaction rawTx;
@@ -256,20 +287,28 @@ Value createrawtransaction(const Array& params, bool fHelp)
     const Object& o = input.get_obj();
     const Value& txid_v = find_value(o, "txid");
     if (txid_v.type() != str_type)
+    {
+      printf("Invalid parameter,  missing txid key\n");
       throw JSONRPCError(-8, "Invalid parameter, missing txid key");
-
+    }
     string txid = txid_v.get_str();
     if (!IsHex(txid))
+    {
+      printf("Invalid parameter,  expected hex txid\n");
       throw JSONRPCError(-8, "Invalid parameter, expected hex txid");
-
+    }
     const Value& vout_v = find_value(o, "vout");
     if (vout_v.type() != int_type)
+    {
+      printf("Invalid parameter,  missing vout key\n");
       throw JSONRPCError(-8, "Invalid parameter, missing vout key");
-
+    }
     int nOutput = vout_v.get_int();
     if (nOutput < 0)
-      throw JSONRPCError(-8, "Invalid parameter, vout must be positive");
-
+    {
+      printf("Invalid parameter,  vout must be positive\n");
+      throw JSONRPCError(-8, "Invalid parameter, vout must be positive"); 
+    }
     CTxIn in(COutPoint(uint256(txid), nOutput));
     rawTx.vin.push_back(in);
   }
@@ -279,8 +318,6 @@ Value createrawtransaction(const Array& params, bool fHelp)
   {
     if (s.name_ == "data")
     {
-
-//throw JSONRPCError(-88, string("s.value_="+s.value_.get_str()));
       std::string temp=s.value_.get_str();
       std::vector<unsigned char> data(temp.begin(), temp.end());
 
@@ -291,11 +328,15 @@ Value createrawtransaction(const Array& params, bool fHelp)
     {
       CBitcoinAddress address(s.name_);
       if (!address.IsValid())
+      {
+        printf("Invalid bitcoin-scrypt address\n");
         throw JSONRPCError(-5, string("Invalid Bitcoin-sCrypt address:")+s.name_);
-
+      }
       if (setAddress.count(address))
+      {
+        printf("Invalid paramete,  duplicated address\n");
         throw JSONRPCError(-8, string("Invalid parameter, duplicated address: ")+s.name_);
-
+      }
       setAddress.insert(address);
 
       CScript scriptPubKey;
@@ -304,6 +345,7 @@ Value createrawtransaction(const Array& params, bool fHelp)
 
       CTxOut out(nAmount, scriptPubKey);
       rawTx.vout.push_back(out);
+
     }
   }
   CDataStream ss(SER_NETWORK, PROTOCOL_VERSION);

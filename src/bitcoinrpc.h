@@ -62,6 +62,7 @@ extern json_spirit::Value repairwallet(const json_spirit::Array& params, bool fH
 extern json_spirit::Value zapwallettxes(const json_spirit::Array& params, bool fHelp);
 extern json_spirit::Value getnetworkhashps(const json_spirit::Array& params, bool fHelp);
 extern std::vector<std::string> getunspent();
+extern json_spirit::Object getraw(std::string);
 extern std::vector<unsigned char> ParseHexV(const json_spirit::Array& value, std::string strName);
 
 double GetPoSKernelPS();
