@@ -42,7 +42,8 @@ UpdaterForm::UpdaterForm(QWidget *parent)
 {
      ui.setupUi(this);
 cout<<"data dir "<<strDataDir<<"\n";
-
+string something="data dir "+strDataDir;
+ui.listWidget->addItem(something.c_str());
 
 }
 
