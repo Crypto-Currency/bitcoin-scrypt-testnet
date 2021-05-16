@@ -3,7 +3,7 @@
 
 #include <boost/filesystem.hpp>
 #include <boost/filesystem/fstream.hpp>
-
+#include <boost/algorithm/string.hpp>
 #include "updater.h"
 
 using namespace std;
@@ -12,7 +12,7 @@ using namespace boost;
 
 bool sucess=false;
 
-string initicker="BTCS";
+string initicker="BTCS";// check GetDefaultDataDir() for lowercase
 string DirName="Bitcoin-sCrypt";
 string downlocation="http://altcoinwarz.com:8080/BTCS/";
 string appname="Bitcoin-sCrypt-qt.exe";
@@ -21,6 +21,7 @@ string apppath="C:\\"+DirName+"\\";
 std::string strDataDir = GetDefaultDataDir().string();
 
 
+//-------------------------------------------------------------------------------------
 int main(int argc, char *argv[])
 {
   QApplication app(argc, argv);
@@ -37,16 +38,47 @@ int main(int argc, char *argv[])
 }
 
 
+//-------------------------------------------------------------------------------------
 UpdaterForm::UpdaterForm(QWidget *parent)
      : QWidget(parent)
 {
      ui.setupUi(this);
 cout<<"data dir "<<strDataDir<<"\n";
-string something="data dir "+strDataDir;
-ui.listWidget->addItem(something.c_str());
+
+  string temp="checking path "+strDataDir;
+  ui.listWidget->addItem(temp.c_str());
+
+//  Memo1->Lines->Add("checking path "+path);
+  try
+  {
+    QDir dir(strDataDir.c_str());
+    if (!dir.exists())
+    {
+      temp="creating "+strDataDir;
+      ui.listWidget->addItem(temp.c_str());
+      if(!dir.mkpath(strDataDir.c_str()))
+      {
+        temp="can not create "+strDataDir;
+        ui.listWidget->addItem(temp.c_str());
+        throw runtime_error("Can not create "+strDataDir);
+      }
+    }
+    else
+    {
+      temp="path exists.";
+      ui.listWidget->addItem(temp.c_str());
+    }
+  }
+  catch (std::exception& e)
+  {
+    QMessageBox::information(this,tr("creating path"),tr(e.what()) );
+  }
+
+
 
 }
 
+//-------------------------------------------------------------------------------------
 boost::filesystem::path GetDefaultDataDir()
 {
     namespace fs = boost::filesystem;
@@ -71,8 +103,10 @@ boost::filesystem::path GetDefaultDataDir()
     return pathRet / DirName.c_str();
 #else
     // Unix
-  string dirname="."+DirName;
-    return pathRet / dirname.c_str();
+  string dname="."+DirName;
+  boost::algorithm::to_lower(dname);  // some coins use all lower case
+  return pathRet / dname.c_str();
 #endif
 #endif
 }
+
