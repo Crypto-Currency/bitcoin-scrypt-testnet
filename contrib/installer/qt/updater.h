@@ -1,6 +1,11 @@
 #ifndef UPDATERFORM_H
 #define UPDATERFORM_H
 
+#include <QNetworkAccessManager>
+#include <QNetworkRequest>
+#include <QNetworkReply>
+#include <QTimer>
+
 #include <boost/filesystem.hpp>
 #include <boost/filesystem/path.hpp>
 
@@ -13,14 +18,26 @@ class UpdaterForm : public QWidget
 {
   Q_OBJECT
 
+  QNetworkAccessManager manager;
+
   public:
     UpdaterForm(QWidget *parent = 0);
+    Ui::UpdaterForm ui;
 
   private slots:
-//     void on_inputSpinBox1_valueChanged(int value);
-//     void on_inputSpinBox2_valueChanged(int value);
+    void start();
+    void getlist();
+    void getListFinished(QNetworkReply* reply);
+    void downloadFinished(QNetworkReply *reply);
+    bool netHandleError(QNetworkReply* reply, QString urlDownload);
+    void networkTimeout();
+    static bool isHttpRedirect(QNetworkReply *reply);
 
   private:
-    Ui::UpdaterForm ui;
+    QTimer *networkTimer;
+
+  QString latestNetError;
+  QString latestFileError;
+
 };
 #endif

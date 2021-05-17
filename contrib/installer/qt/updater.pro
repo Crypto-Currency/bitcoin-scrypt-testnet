@@ -1,3 +1,7 @@
+TEMPLATE = app
+TARGET = updater-qt
+QT += network
+
 HEADERS = updater.h
 SOURCES = updater.cpp
 RESOURCES = updater.qrc

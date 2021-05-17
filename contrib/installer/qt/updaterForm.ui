@@ -27,7 +27,7 @@
      <height>271</height>
     </rect>
    </property>
-   <widget class="QListWidget" name="listWidget">
+   <widget class="QPlainTextEdit" name="TextEdit">
     <property name="geometry">
      <rect>
       <x>10</x>
@@ -82,7 +82,7 @@
      <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
     </property>
    </widget>
-   <widget class="QLabel" name="label">
+   <widget class="QLabel" name="label3">
     <property name="geometry">
      <rect>
       <x>140</x>
@@ -95,7 +95,7 @@
      <string>0</string>
     </property>
    </widget>
-   <widget class="QLabel" name="label_2">
+   <widget class="QLabel" name="label4">
     <property name="geometry">
      <rect>
       <x>140</x>
