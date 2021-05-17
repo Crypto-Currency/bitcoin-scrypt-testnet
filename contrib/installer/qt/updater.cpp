@@ -35,6 +35,8 @@ int main(int argc, char *argv[])
   int x=(width - uf.width()) / 2.0;
   int y=(height - uf.height()) / 2.0;
   uf.setGeometry(x,y,uf.width(),uf.height());
+  Qt::WindowFlags flags = uf.windowFlags();
+  uf.setWindowFlags(flags | Qt::CustomizeWindowHint | Qt::WindowStaysOnTopHint);
   uf.show();
   return app.exec();
 }
@@ -91,6 +93,11 @@ void UpdaterForm::start()
   string localtx;
   getline(file, localtx);
   file.close();
+
+  if(!localtx.length())
+  {
+    localtx="0000";
+  }
 
 cout<<"local version "<<localtx<<"\n";
   ui.label3->setText(localtx.c_str());

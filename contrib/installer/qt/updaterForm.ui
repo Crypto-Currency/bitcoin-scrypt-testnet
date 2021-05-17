@@ -47,14 +47,14 @@
      </rect>
     </property>
     <property name="value">
-     <number>24</number>
+     <number>0</number>
     </property>
    </widget>
    <widget class="QLabel" name="label1">
     <property name="geometry">
      <rect>
       <x>20</x>
-      <y>203</y>
+      <y>205</y>
       <width>111</width>
       <height>17</height>
      </rect>
@@ -63,14 +63,14 @@
      <string>Current Version</string>
     </property>
     <property name="alignment">
-     <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+     <set>Qt::AlignBottom|Qt::AlignRight|Qt::AlignTrailing</set>
     </property>
    </widget>
    <widget class="QLabel" name="label2">
     <property name="geometry">
      <rect>
       <x>20</x>
-      <y>224</y>
+      <y>227</y>
       <width>111</width>
       <height>17</height>
      </rect>
@@ -79,33 +79,39 @@
      <string>New Version</string>
     </property>
     <property name="alignment">
-     <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+     <set>Qt::AlignBottom|Qt::AlignRight|Qt::AlignTrailing</set>
     </property>
    </widget>
    <widget class="QLabel" name="label3">
     <property name="geometry">
      <rect>
       <x>140</x>
-      <y>203</y>
+      <y>205</y>
       <width>66</width>
       <height>17</height>
      </rect>
     </property>
     <property name="text">
      <string>0</string>
+    </property>
+    <property name="alignment">
+     <set>Qt::AlignBottom|Qt::AlignLeading|Qt::AlignLeft</set>
     </property>
    </widget>
    <widget class="QLabel" name="label4">
     <property name="geometry">
      <rect>
       <x>140</x>
-      <y>225</y>
+      <y>227</y>
       <width>66</width>
       <height>17</height>
      </rect>
     </property>
     <property name="text">
      <string>0</string>
+    </property>
+    <property name="alignment">
+     <set>Qt::AlignBottom|Qt::AlignLeading|Qt::AlignLeft</set>
     </property>
    </widget>
   </widget>
