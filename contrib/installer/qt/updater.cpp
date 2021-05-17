@@ -93,7 +93,7 @@ void UpdaterForm::start()
   string localtx;
   getline(file, localtx);
   file.close();
-
+  boost::trim_right(localtx);
   if(!localtx.length())
   {
     localtx="0000";
@@ -148,6 +148,7 @@ cout<<"getListFinished : connect finished\n";
 
 string line=versionlist.toStdString();//at(0).toLocal8Bit().constData();
 cout<<"remote version "<<line<<"\n";
+  boost::trim_right(line);
   ui.label4->setText(line.c_str());
 
 
