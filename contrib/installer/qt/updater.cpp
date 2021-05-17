@@ -122,7 +122,6 @@ cout<<"iRemoteVer "<<iRemoteVer<<"\n";
     temp="Found new version";
     ui.TextEdit->appendPlainText(temp.c_str());
 
-
     download(QString::fromStdString(strAppDir));
 //cout<<"returned from Download "<<qtemp<<"\n";
 //    ui.TextEdit->appendPlainText(qtemp);
@@ -143,7 +142,7 @@ void UpdaterForm::getlist()
   connect(&manager, SIGNAL(finished(QNetworkReply*)), this, SLOT(getListFinished(QNetworkReply*)));
 
   QNetworkRequest request;
-  QString downloadLocation = QString::fromStdString(downlocation+"/version.txt");
+  downloadLocation = QString::fromStdString(downlocation+"/version.txt");
 cout<<"downloadLocation "<<downloadLocation.toStdString()<<"\n";
 
   request.setUrl(QUrl(downloadLocation));
@@ -177,10 +176,14 @@ cout<<"remote version "<<line<<"\n";
 }
 
 //-------------------------------------------------------------------------------------
-void UpdaterForm::download(const QUrl &filename)
+void UpdaterForm::download(const QUrl &downTo)
 {
-QString temp=filename.toString();
-cout<<"in download : filename "<<temp.toStdString()<<"\n";
+  QString temp=downTo.toString();
+cout<<"in download : download APP to folder "<<temp.toStdString()<<"\n";
+cout<<"in download : download from "<<downlocation<<"\n";
+cout<<"in download : download DATA to "<<downloadLocation.toStdString()<<"\n";
+
+
 
 /*
   QNetworkRequest request;//(filename);

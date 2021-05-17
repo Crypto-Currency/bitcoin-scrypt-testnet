@@ -35,7 +35,7 @@ class UpdaterForm : public QWidget
     static bool isHttpRedirect(QNetworkReply *reply);
 
   private:
-    void download(const QUrl &filename);
+    void download(const QUrl &downTo);
     QTimer *networkTimer;
 
     QString latestNetError;
