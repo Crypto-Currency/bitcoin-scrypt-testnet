@@ -180,8 +180,9 @@ void UpdaterForm::download(const QUrl &downTo)
 {
   QString temp=downTo.toString();
 cout<<"in download : download APP to folder "<<temp.toStdString()<<"\n";
-cout<<"in download : download from "<<downlocation<<"\n";
-cout<<"in download : download DATA to "<<downloadLocation.toStdString()<<"\n";
+cout<<"in download : download APP from "<<downlocation<<"\n";
+cout<<"in download : download DATA to "<<strDataDir<<"\n";
+cout<<"in download : download DATA FROM "<<downloadLocation.toStdString()<<"\n";
 
 
 
