@@ -12,6 +12,7 @@
 #include "ui_updaterForm.h"
 
 boost::filesystem::path GetDefaultDataDir();
+boost::filesystem::path GetDefaultAppDir();
 
 
 class UpdaterForm : public QWidget
@@ -34,10 +35,11 @@ class UpdaterForm : public QWidget
     static bool isHttpRedirect(QNetworkReply *reply);
 
   private:
+    void download(const QUrl &filename);
     QTimer *networkTimer;
 
-  QString latestNetError;
-  QString latestFileError;
+    QString latestNetError;
+    QString latestFileError;
 
 };
 #endif

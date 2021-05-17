@@ -21,6 +21,7 @@ string appname="Bitcoin-sCrypt-qt.exe";
 string apppath="C:\\"+DirName+"\\";
 
 std::string strDataDir = GetDefaultDataDir().string();
+std::string strAppDir = GetDefaultAppDir().string();
 
 
 //-------------------------------------------------------------------------------------
@@ -104,8 +105,28 @@ cout<<"local version "<<localtx<<"\n";
 
 // get remote version.txt and read it
   getlist();
+  while(networkTimer->isActive())
+  {// wait for download to finish
+    qApp->processEvents();
+  }
+
+  int iLocalVer=ui.label3->text().toInt();
+  int iRemoteVer=ui.label4->text().toInt();
+
+string label4txt=ui.label4->text().toStdString();
+cout<<"label4txt "<<label4txt<<"\n"; 
+cout<<"iLocalVer "<<iLocalVer<<"\n"; 
+cout<<"iRemoteVer "<<iRemoteVer<<"\n"; 
+  if(iRemoteVer > iLocalVer)
+  {
+    temp="Found new version";
+    ui.TextEdit->appendPlainText(temp.c_str());
 
 
+    download(QString::fromStdString(strAppDir));
+//cout<<"returned from Download "<<qtemp<<"\n";
+//    ui.TextEdit->appendPlainText(qtemp);
+  }  
 
 
 }
@@ -115,7 +136,7 @@ void UpdaterForm::getlist()
 {
   string temp="checking "+downlocation;
   ui.TextEdit->appendPlainText(temp.c_str());
-cout<<"temp "<<temp<<"\n";
+//cout<<"temp "<<temp<<"\n";
 
 // get remote version
 // connect the event and launch it
@@ -128,49 +149,47 @@ cout<<"downloadLocation "<<downloadLocation.toStdString()<<"\n";
   request.setUrl(QUrl(downloadLocation));
   request.setRawHeader("User-Agent", "Wallet update request");
 
-cout<<"starting network timer \n";
+//cout<<"starting network timer \n";
   networkTimer->start();
-cout<<"manager get \n";
+//cout<<"manager get \n";
   manager.get(request);
+
 }
 
 //-------------------------------------------------------------------------------------
 void UpdaterForm::getListFinished(QNetworkReply* reply)
 {
-cout<<"in getListFinished \n";
   if (netHandleError(reply, downloadLocation))
   {
-cout<<"getListFinished : disconnect finished\n";
-    disconnect(&manager, SIGNAL(finished(QNetworkReply*)), 0, 0);  
-cout<<"getListFinished : connect finished\n";
-    connect(&manager, SIGNAL(finished(QNetworkReply*)), SLOT(downloadFinished(QNetworkReply*)));
+//    disconnect(&manager, SIGNAL(finished(QNetworkReply*)), 0, 0);  
+//    connect(&manager, SIGNAL(finished(QNetworkReply*)), SLOT(downloadFinished(QNetworkReply*)));
     QString versionlist=reply->readAll();
 
-string line=versionlist.toStdString();//at(0).toLocal8Bit().constData();
+  string line=versionlist.toStdString();//at(0).toLocal8Bit().constData();
 cout<<"remote version "<<line<<"\n";
   boost::trim_right(line);
   ui.label4->setText(line.c_str());
-
-
-//    QStringList list = pagelist.split('\n');
-//    QString line;
-
-/*    for(int i=0;i<list.count();i++)
-    {
-      line=list.at(i).toLocal8Bit().constData();
-      line.simplified(); // strip extra characters
-      line.replace("\r",""); // this one too
-      if(line.length())
-      {  
-        download("http://btcs.altcoinwarz.com/themes/"+line);
-      } 
-    }
-*/
   }
   else
   {
     reply->abort();
   } 
+}
+
+//-------------------------------------------------------------------------------------
+void UpdaterForm::download(const QUrl &filename)
+{
+QString temp=filename.toString();
+cout<<"in download : filename "<<temp.toStdString()<<"\n";
+
+/*
+  QNetworkRequest request;//(filename);
+  request.setUrl(filename);
+  request.setRawHeader("User-Agent", "Wallet theme request");
+  networkTimer->start();
+  reply = manager.get(request);
+  currentDownloads.append(reply);
+*/
 }
 
 //-------------------------------------------------------------------------------------
@@ -187,7 +206,7 @@ cout<<"in downloadFinished \n";
 //      emit error(tr("File Saving Error"), fError, false);
 //    }
 //    currentDownloads.removeAll(reply);
-    reply->deleteLater();
+//    reply->deleteLater();
 
     // when finish all, re-enable the download button and force a find
 //    if (currentDownloads.isEmpty()) 
@@ -205,6 +224,8 @@ cout<<"in downloadFinished \n";
 bool UpdaterForm::netHandleError(QNetworkReply* reply, QString urlDownload)
 {
 cout<<"in netHandleError\n";
+
+
   networkTimer->stop();
   if (reply->error())
   {
@@ -242,7 +263,6 @@ void UpdaterForm::networkTimeout()
 //  statusLabel->setText("");
 //  downloadButton->setEnabled(true);
   disconnect(&manager, SIGNAL(finished(QNetworkReply*)), 0, 0);  
-//  Find();
 //  emit error(tr("Network Error : Timeout"), latestNetError, true);
     QMessageBox::information(this,tr("Network Error"),tr(latestNetError.toStdString().c_str()) );
 }
@@ -281,6 +301,39 @@ boost::filesystem::path GetDefaultDataDir()
 #else
     // Unix
   string dname="."+DirName;
+  boost::algorithm::to_lower(dname);  // some coins use all lower case
+  return pathRet / dname.c_str();
+#endif
+#endif
+}
+
+//-------------------------------------------------------------------------------------
+boost::filesystem::path GetDefaultAppDir()
+{
+    namespace fs = boost::filesystem;
+    // Windows < Vista: C:\Documents and Settings\Username\Application Data\DirName
+    // Windows >= Vista: C:\Users\Username\AppData\Roaming\DirName
+    // Mac: ~/Library/Application Support/DirName
+    // Unix: ~/.DirName
+#ifdef WIN32
+    // Windows
+//    return GetSpecialFolderPath(CSIDL_APPDATA) / DirName.c_str();
+    return "C:" / DirName.c_str();
+#else
+    fs::path pathRet;
+    char* pszHome = getenv("HOME");
+    if (pszHome == NULL || strlen(pszHome) == 0)
+        pathRet = fs::path("/");
+    else
+        pathRet = fs::path(pszHome);
+#ifdef MAC_OSX
+    // Mac
+    pathRet = "/Applications";
+//    fs::create_directory(pathRet);
+    return pathRet / DirName.c_str();
+#else
+    // Unix
+  string dname="Desktop/"+DirName;
   boost::algorithm::to_lower(dname);  // some coins use all lower case
   return pathRet / dname.c_str();
 #endif
