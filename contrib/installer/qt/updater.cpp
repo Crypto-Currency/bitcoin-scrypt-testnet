@@ -184,6 +184,7 @@ cout<<"in download : download APP from "<<downlocation<<"\n";
 cout<<"in download : download DATA to "<<strDataDir<<"\n";
 cout<<"in download : download DATA FROM "<<downloadLocation.toStdString()<<"\n";
 
+cout<<"in download : download APP name "<<GetDefaultAppName()<<"\n";
 
 
 /*
@@ -337,10 +338,37 @@ boost::filesystem::path GetDefaultAppDir()
     return pathRet / DirName.c_str();
 #else
     // Unix
-  string dname="Desktop/"+DirName;
+  string dname=DirName;
   boost::algorithm::to_lower(dname);  // some coins use all lower case
+
+////// make a folder on the desktop
+//dname="Desktop/"+dname;
+//fs::create_directory(pathRet / dname.c_str());
+
+/////  don't make a folder
+dname="Desktop/";
+
+cout<<"unix location "<<pathRet / dname.c_str()<<"\n";
+
   return pathRet / dname.c_str();
 #endif
 #endif
+}
+
+//-------------------------------------------------------------------------------------
+string GetDefaultAppName()
+{
+#ifdef WIN32
+  // Windows
+  return "Bitcoin-sCrypt-qt.exe";
+#endif
+
+#ifdef MAC_OSX
+  // MAC
+  return "BTCS-mac-qt.dmg";
+#endif
+
+  // Unix
+  return "Bitcoin-sCrypt-qt";
 }
 

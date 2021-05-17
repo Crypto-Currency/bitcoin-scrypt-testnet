@@ -13,7 +13,7 @@
 
 boost::filesystem::path GetDefaultDataDir();
 boost::filesystem::path GetDefaultAppDir();
-
+std::string GetDefaultAppName();
 
 class UpdaterForm : public QWidget
 {
