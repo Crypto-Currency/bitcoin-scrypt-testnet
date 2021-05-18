@@ -389,7 +389,7 @@ boost::filesystem::path GetDefaultAppDir()
     // Mac
     pathRet = "/Applications/"+GetDefaultAppName()+".app/Contents/MacOS/";
 //    fs::create_directory(pathRet);
-    return pathRet / DirName.c_str();
+    return pathRet;
 #else
 
 cout<<"MAC path\n"<<"/Applications/"+GetDefaultAppName()+".app/Contents/MacOS/\n";
