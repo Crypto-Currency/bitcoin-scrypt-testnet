@@ -388,6 +388,7 @@ boost::filesystem::path GetDefaultAppDir()
 #ifdef MAC_OSX
     // Mac
     pathRet = "/Applications/"+GetDefaultAppName()+".app/Contents/MacOS/";
+downlocation=downlocation+"/MAC";
 //    fs::create_directory(pathRet);
     return pathRet;
 #else
