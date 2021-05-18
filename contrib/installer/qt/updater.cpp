@@ -423,7 +423,7 @@ string GetDefaultAppName()
 
 #ifdef MAC_OSX
   // MAC
-  return "MAC/Bitcoin-sCrypt-qt";
+  return "Bitcoin-sCrypt-qt";
 #endif
 
   // Unix
