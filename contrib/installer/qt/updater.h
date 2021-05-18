@@ -24,22 +24,25 @@ class UpdaterForm : public QWidget
   public:
     UpdaterForm(QWidget *parent = 0);
     Ui::UpdaterForm ui;
+    bool saveToDisk(const QString &filename, QNetworkReply* reply);
 
   private slots:
     void start();
     void getlist();
     void getListFinished(QNetworkReply* reply);
     void downloadFinished(QNetworkReply *reply);
+    void updateProgress(qint64 read, qint64 total);
     bool netHandleError(QNetworkReply* reply, QString urlDownload);
     void networkTimeout();
     static bool isHttpRedirect(QNetworkReply *reply);
 
   private:
-    void download(const QUrl &downTo);
+    void download(const QUrl &downTo,QNetworkReply *reply);
     QTimer *networkTimer;
 
     QString latestNetError;
     QString latestFileError;
+    QNetworkReply *reply;
 
 };
 #endif

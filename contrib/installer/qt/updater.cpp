@@ -20,6 +20,8 @@ QString downloadLocation;
 string appname="Bitcoin-sCrypt-qt.exe";
 string apppath="C:\\"+DirName+"\\";
 
+string FileName; //global 
+
 std::string strDataDir = GetDefaultDataDir().string();
 std::string strAppDir = GetDefaultAppDir().string();
 
@@ -122,7 +124,7 @@ cout<<"iRemoteVer "<<iRemoteVer<<"\n";
     temp="Found new version";
     ui.TextEdit->appendPlainText(temp.c_str());
 
-    download(QString::fromStdString(strAppDir));
+    download(QString::fromStdString(strAppDir),NULL);
 //cout<<"returned from Download "<<qtemp<<"\n";
 //    ui.TextEdit->appendPlainText(qtemp);
   }  
@@ -160,8 +162,8 @@ void UpdaterForm::getListFinished(QNetworkReply* reply)
 {
   if (netHandleError(reply, downloadLocation))
   {
-//    disconnect(&manager, SIGNAL(finished(QNetworkReply*)), 0, 0);  
-//    connect(&manager, SIGNAL(finished(QNetworkReply*)), SLOT(downloadFinished(QNetworkReply*)));
+    disconnect(&manager, SIGNAL(finished(QNetworkReply*)), 0, 0);  
+    connect(&manager, SIGNAL(finished(QNetworkReply*)), SLOT(downloadFinished(QNetworkReply*)));
     QString versionlist=reply->readAll();
 
   string line=versionlist.toStdString();//at(0).toLocal8Bit().constData();
@@ -176,53 +178,108 @@ cout<<"remote version "<<line<<"\n";
 }
 
 //-------------------------------------------------------------------------------------
-void UpdaterForm::download(const QUrl &downTo)
+void UpdaterForm::download(const QUrl &downTo,QNetworkReply *reply)
 {
+  networkTimer->stop();
   QString temp=downTo.toString();
+  string appFilename=GetDefaultAppName();
 cout<<"in download : download APP to folder "<<temp.toStdString()<<"\n";
 cout<<"in download : download APP from "<<downlocation<<"\n";
 cout<<"in download : download DATA to "<<strDataDir<<"\n";
 cout<<"in download : download DATA FROM "<<downloadLocation.toStdString()<<"\n";
 
-cout<<"in download : download APP name "<<GetDefaultAppName()<<"\n";
+cout<<"in download : download APP name "<<appFilename<<"\n";
 
-
-/*
+// get app
+  disconnect(&manager, SIGNAL(finished(QNetworkReply*)), 0, 0);  
+  connect(&manager, SIGNAL(finished(QNetworkReply*)), this, SLOT(downloadFinished(QNetworkReply*)));
   QNetworkRequest request;//(filename);
-  request.setUrl(filename);
-  request.setRawHeader("User-Agent", "Wallet theme request");
+
+string tempurl=downlocation+"/"+appFilename;
+  request.setUrl(QString::fromStdString(tempurl));
+cout<<"requesting "<<tempurl<<"\n";
+  request.setRawHeader("User-Agent", "app request");
+
+  FileName=temp.toStdString()+appFilename;
+
   networkTimer->start();
   reply = manager.get(request);
-  currentDownloads.append(reply);
-*/
+  connect(reply, SIGNAL(downloadProgress(qint64, qint64)),
+            this, SLOT(updateProgress(qint64, qint64)));
+  while(networkTimer->isActive())
+  {// wait for download to finish
+    qApp->processEvents();
+  }
+QFile myfile(QString::fromStdString(FileName));
+myfile.setPermissions(QFile::ReadOwner|QFile::WriteOwner|QFile::ExeOwner|QFile::ReadGroup|QFile::ExeGroup|QFile::ReadOther|QFile::ExeOther);
+cout<<"wrote file to "<<FileName<<"\n";
+
+
+// get version.txt
+  disconnect(&manager, SIGNAL(finished(QNetworkReply*)), 0, 0);  
+  connect(&manager, SIGNAL(finished(QNetworkReply*)), this, SLOT(downloadFinished(QNetworkReply*)));
+  request.setUrl(downloadLocation);
+cout<<"requesting "<<downloadLocation.toStdString()<<"\n";
+  request.setRawHeader("User-Agent", "version.txt request");
+
+  FileName=strDataDir+"/version.txt";
+  networkTimer->start();
+  reply = manager.get(request);
+  connect(reply, SIGNAL(downloadProgress(qint64, qint64)),
+            this, SLOT(updateProgress(qint64, qint64)));
+
+  while(networkTimer->isActive())
+  {// wait for download to finish
+    qApp->processEvents();
+  }
+cout<<"wrote file to "<<FileName<<"\n";
+
 }
 
 //-------------------------------------------------------------------------------------
 void UpdaterForm::downloadFinished(QNetworkReply *reply)
 {
-cout<<"in downloadFinished \n";
-  QUrl url = reply->url();
-  if (netHandleError(reply, url.toEncoded()))
-  {
-//    QString filename = inipath + url.path().replace("/themes/","/");
-//    if (!saveToDisk(filename, reply))
-//    {
-//      QString fError = tr("Could not open ") + filename + " for writing: " + latestFileError;
-//      emit error(tr("File Saving Error"), fError, false);
-//    }
-//    currentDownloads.removeAll(reply);
-//    reply->deleteLater();
+  networkTimer->stop();
 
-    // when finish all, re-enable the download button and force a find
-//    if (currentDownloads.isEmpty()) 
-//    {
-//	  statusLabel->setText("");
-//      downloadButton->setEnabled(true);
-      disconnect(&manager, SIGNAL(finished(QNetworkReply*)), 0, 0);  
-//      find();
-//      emit information(tr("Themes Download"), tr("Themes were successfully downloaded and installed."));
-//    }
+  if (!saveToDisk(FileName.c_str(), reply))
+  {
+    QString fError=tr("Could not open ")+FileName.c_str()+" for writing: "+latestFileError;
+cout<<"File Saving Error"<<fError.toStdString()<<"\n";
   }
+
+  disconnect(&manager, SIGNAL(finished(QNetworkReply*)), 0, 0);  
+cout<<"downloadFinished done\n";
+
+}
+
+//-------------------------------------------------------------------------------------
+bool UpdaterForm::saveToDisk(const QString &filename, QNetworkReply *reply)
+{
+  string temp="saving "+filename.toStdString();
+  ui.TextEdit->appendPlainText(temp.c_str());
+cout<<"save to disk writing "<<filename.toStdString()<<"\n";
+  QFile file(filename);
+  if (!file.open(QIODevice::WriteOnly))
+  {
+    latestFileError = file.errorString();
+cout<<"file open error "<<file.errorString().toStdString()<<"\n";
+
+    return false;
+  }
+
+  file.write(reply->readAll());
+  file.close();
+
+  ui.progressBar->setValue(0);
+  return true;
+}
+
+//-------------------------------------------------------------------------------------
+void UpdaterForm::updateProgress(qint64 read, qint64 total)
+{
+  ui.progressBar->setMaximum(total);
+  ui.progressBar->setValue(read);
+  networkTimer->start(); // restart the timer so it doesn't timeout on long downloads
 }
 
 //-------------------------------------------------------------------------------------
@@ -265,11 +322,8 @@ void UpdaterForm::networkTimeout()
   {
     latestNetError = tr("Network timeout. Please check your network and try again.");
   }
-//  statusLabel->setText("");
-//  downloadButton->setEnabled(true);
   disconnect(&manager, SIGNAL(finished(QNetworkReply*)), 0, 0);  
-//  emit error(tr("Network Error : Timeout"), latestNetError, true);
-    QMessageBox::information(this,tr("Network Error"),tr(latestNetError.toStdString().c_str()) );
+  QMessageBox::information(this,tr("Network Error"),tr(latestNetError.toStdString().c_str()));
 }
 
 //-------------------------------------------------------------------------------------
@@ -342,11 +396,11 @@ boost::filesystem::path GetDefaultAppDir()
   boost::algorithm::to_lower(dname);  // some coins use all lower case
 
 ////// make a folder on the desktop
-//dname="Desktop/"+dname;
-//fs::create_directory(pathRet / dname.c_str());
+dname="Desktop/"+dname+"/";
+fs::create_directory(pathRet / dname.c_str());
 
 /////  don't make a folder
-dname="Desktop/";
+//dname="Desktop/";
 
 cout<<"unix location "<<pathRet / dname.c_str()<<"\n";
 
