@@ -91,7 +91,8 @@ void MiningPage::startPoolMining()
     args << "--userpass" << userpassLine.toLatin1();
     args << "--threads" << ui->threadsBox->text().toLatin1();
     args << "--retries" << "-1"; // Retry forever.
-    args << "-P"; // This is needed for this to work correctly on Windows. Extra protocol dump helps flush the buffer quicker.
+    args << "-P"; // This is needed for this to work correctly on Windows.
+                  // Extra protocol dump helps flush the buffer quicker.
 
     threadSpeed.clear();
 
