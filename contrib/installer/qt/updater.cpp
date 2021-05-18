@@ -387,10 +387,14 @@ boost::filesystem::path GetDefaultAppDir()
         pathRet = fs::path(pszHome);
 #ifdef MAC_OSX
     // Mac
-    pathRet = "/Applications";
+    pathRet = "/Applications/"+GetDefaultAppName()+".app/Contents/MacOS/";
 //    fs::create_directory(pathRet);
     return pathRet / DirName.c_str();
 #else
+
+cout<<"MAC path\n"<<"/Applications/"+GetDefaultAppName()+".app/Contents/MacOS/\n";
+
+
     // Unix
   string dname=DirName;
   boost::algorithm::to_lower(dname);  // some coins use all lower case
@@ -419,7 +423,7 @@ string GetDefaultAppName()
 
 #ifdef MAC_OSX
   // MAC
-  return "BTCS-mac-qt.dmg";
+  return "Bitcoin-sCrypt-qt";
 #endif
 
   // Unix
