@@ -127,6 +127,7 @@ HEADERS += src/qt/bitcoingui.h \
     src/walletdb.h \
     src/script.h \
     src/init.h \
+	src/qt/splash.h \
 	src/qt/skinspage.h \
 	src/qt/chatterboxpage.h \
 	src/qt/votepage.h \
@@ -194,6 +195,7 @@ SOURCES += src/qt/bitcoin.cpp src/qt/bitcoingui.cpp \
     src/script.cpp \
     src/main.cpp \
     src/init.cpp \
+	src/qt/splash.cpp \
 	src/qt/skinspage.cpp \
 	src/qt/chatterboxpage.cpp \
 	src/qt/votepage.cpp \
@@ -253,6 +255,7 @@ FORMS += \
     src/qt/forms/coincontroldialog.ui \
     src/qt/forms/addressbookpage.ui \
     src/qt/forms/skinspage.ui \
+    src/qt/forms/splash.ui \
     src/qt/forms/chatterboxpage.ui \
     src/qt/forms/votepage.ui \
     src/qt/forms/createvotedialog.ui \

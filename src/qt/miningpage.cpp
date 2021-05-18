@@ -282,7 +282,7 @@ void MiningPage::updateSpeed()
 void MiningPage::reportToList(QString msg, int type, QString time)
 {
     QString message;
-    if (time == NULL)
+    if (!time.length())
         message = QString("[%1] - %2").arg(QTime::currentTime().toString(), msg);
     else
         message = QString("[%1] - %2").arg(time, msg);
