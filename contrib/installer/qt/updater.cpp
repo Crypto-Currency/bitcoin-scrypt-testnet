@@ -1,4 +1,5 @@
 #include <QApplication>
+#include <QProcess>
 #include <QtGui>
 #include <QUrl>
 
@@ -128,8 +129,17 @@ cout<<"iRemoteVer "<<iRemoteVer<<"\n";
 //cout<<"returned from Download "<<qtemp<<"\n";
 //    ui.TextEdit->appendPlainText(qtemp);
   }  
+  else
+  { // launch wallet
+    string strAppFilename=GetDefaultAppName();
+    string strPathApp=strAppDir+strAppFilename;
+cout<<"strAppDir "<<strAppDir<<"\n";
+cout<<"strAppFilename "<<strAppFilename<<"\n";
+cout<<"strPathApp "<<strPathApp<<"\n";
 
-
+    QProcess::startDetached(strPathApp.c_str());
+exit(0);
+  }
 }
 
 //-------------------------------------------------------------------------------------
@@ -376,7 +386,6 @@ boost::filesystem::path GetDefaultAppDir()
     // Unix: ~/.DirName
 #ifdef WIN32
     // Windows
-//    return GetSpecialFolderPath(CSIDL_APPDATA) / DirName.c_str();
     return "C:" / DirName.c_str();
 #else
     fs::path pathRet;
@@ -392,9 +401,6 @@ downlocation=downlocation+"/MAC";
 //    fs::create_directory(pathRet);
     return pathRet;
 #else
-
-cout<<"MAC path\n"<<"/Applications/"+GetDefaultAppName()+".app/Contents/MacOS/\n";
-
 
     // Unix
   string dname=DirName;
