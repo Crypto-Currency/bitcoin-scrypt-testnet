@@ -1,8 +1,10 @@
 TEMPLATE = app
 TARGET = updater-qt
+
 CONFIG += thread -w
-QT += widgets
 QT += network
+
+greaterThan(4,QT_MAJOR_VERSION): QT += widgets
 
 OBJECTS_DIR = build
 MOC_DIR = build
@@ -74,6 +76,4 @@ contains(RELEASE, 1) {
         LIBS += -Wl,-Bdynamic
     }
 }
-
-system($$QMAKE_LRELEASE -silent $$_PRO_FILE_)
 

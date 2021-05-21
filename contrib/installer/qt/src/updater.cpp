@@ -1,8 +1,15 @@
-//#include <QApplication>
 #include <QProcess>
 
-//#include <QtGui>
+
+#if QT_VERSION >= 0x050000
+ #include <QtGlobal>
+ #include <QApplication>
 #include <QtWidgets>
+#else
+#include <QtGui>
+ #include <QtGui/QApplication>
+#endif
+
 
 #include <QUrl>
 
@@ -15,10 +22,9 @@
 #include "macdockiconhandler.h"
 #endif
 
-//#include <QStandardPaths>
-//#include <io.h> /* for _commit */
-//#include "shlobj.h"
-#include <shlobj.h>
+#ifdef Q_OS_WIN32
+ #include <shlobj.h>
+#endif
 
 using namespace std;
 using namespace boost;

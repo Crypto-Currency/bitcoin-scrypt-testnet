@@ -5,12 +5,20 @@
 #include <QNetworkRequest>
 #include <QNetworkReply>
 #include <QTimer>
-#include <QtWidgets>
+
+#if QT_VERSION >= 0x050000
+ #include <QtWidgets>
+#endif
+
+#ifdef Q_OS_WIN32
+ #include "win_ui_updaterForm.h"
+#else
+ #include "ui_updaterForm.h"
+#endif
 
 #include <boost/filesystem.hpp>
 #include <boost/filesystem/path.hpp>
 
-#include "ui_updaterForm.h"
 
 boost::filesystem::path GetDefaultDataDir();
 boost::filesystem::path GetDefaultAppDir();
