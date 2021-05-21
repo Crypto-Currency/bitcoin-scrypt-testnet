@@ -60,7 +60,7 @@ macx:HEADERS += src/macdockiconhandler.h
 macx:OBJECTIVE_SOURCES += src/macdockiconhandler.mm
 macx:LIBS += -framework Foundation -framework ApplicationServices -framework AppKit
 macx:DEFINES += MAC_OSX MSG_NOSIGNAL=0
-macx:ICON = images/btcs.icns
+macx:ICON = src/images/btcs.icns
 macx:TARGET = "updater-qt"
 
 # Set libraries and includes at end, to use platform-defined defaults if not overridden

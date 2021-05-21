@@ -76,7 +76,7 @@ UpdaterForm::UpdaterForm(QWidget *parent) : QWidget(parent)
     qApp->setWindowIcon(QIcon(":images/"+QString::fromStdString(initicker)));
     setWindowIcon(QIcon(":images/"+QString::fromStdString(initicker)));
 #else
-    setUnifiedTitleAndToolBarOnMac(true);
+//    setUnifiedTitleAndToolBarOnMac(true);
     QApplication::setAttribute(Qt::AA_DontShowIconsInMenus);
 #endif
 
