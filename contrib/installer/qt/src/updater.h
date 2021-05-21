@@ -6,8 +6,11 @@
 #include <QNetworkReply>
 #include <QTimer>
 
+#include <QtGlobal>
 #if QT_VERSION >= 0x050000
- #include <QtWidgets>
+//  #include <QApplication>
+#else
+  #include <QtGui/QApplication>
 #endif
 
 #ifdef Q_OS_WIN32

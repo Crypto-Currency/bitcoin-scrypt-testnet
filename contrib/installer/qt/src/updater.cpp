@@ -1,10 +1,9 @@
 #include <QProcess>
 
-
+#include <QtGlobal>
 #if QT_VERSION >= 0x050000
- #include <QtGlobal>
- #include <QApplication>
-#include <QtWidgets>
+#include <QApplication>
+ #include <QtWidgets>
 #else
 #include <QtGui>
  #include <QtGui/QApplication>

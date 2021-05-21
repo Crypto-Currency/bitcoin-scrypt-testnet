@@ -4,7 +4,7 @@ TARGET = updater-qt
 CONFIG += thread -w
 QT += network
 
-greaterThan(4,QT_MAJOR_VERSION): QT += widgets
+greaterThan(QT_MAJOR_VERSION,4): QT += widgets
 
 OBJECTS_DIR = build
 MOC_DIR = build
