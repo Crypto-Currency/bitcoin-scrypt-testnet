@@ -5,6 +5,7 @@
 #include <QNetworkRequest>
 #include <QNetworkReply>
 #include <QTimer>
+#include <QtWidgets>
 
 #include <boost/filesystem.hpp>
 #include <boost/filesystem/path.hpp>

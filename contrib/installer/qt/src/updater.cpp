@@ -1,6 +1,9 @@
-#include <QApplication>
+//#include <QApplication>
 #include <QProcess>
-#include <QtGui>
+
+//#include <QtGui>
+#include <QtWidgets>
+
 #include <QUrl>
 
 #include <boost/filesystem.hpp>
@@ -11,6 +14,11 @@
 #ifdef Q_OS_MAC
 #include "macdockiconhandler.h"
 #endif
+
+//#include <QStandardPaths>
+//#include <io.h> /* for _commit */
+//#include "shlobj.h"
+#include <shlobj.h>
 
 using namespace std;
 using namespace boost;
@@ -347,7 +355,12 @@ boost::filesystem::path GetDefaultDataDir()
     // Unix: ~/.DirName
 #ifdef WIN32
     // Windows
-    return GetSpecialFolderPath(CSIDL_APPDATA) / DirName.c_str();
+//    return GetSpecialFolderPath(CSIDL_APPDATA) / DirName.c_str();
+  char* appdata = getenv("APPDATA");
+  string datapath=appdata;
+  datapath+="\\"+DirName;
+//  String path=apppath+appname;
+return datapath;
 #else
     fs::path pathRet;
     char* pszHome = getenv("HOME");
@@ -379,7 +392,7 @@ boost::filesystem::path GetDefaultAppDir()
     // Unix: ~/.DirName
 #ifdef WIN32
     // Windows
-    return "C:" / DirName.c_str();
+    return "C:/"+DirName;
 #else
     fs::path pathRet;
     char* pszHome = getenv("HOME");

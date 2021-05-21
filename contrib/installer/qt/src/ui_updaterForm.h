@@ -11,14 +11,13 @@
 #define UI_UPDATERFORM_H
 
 #include <QtCore/QVariant>
-#include <QtGui/QAction>
-#include <QtGui/QApplication>
-#include <QtGui/QButtonGroup>
-#include <QtGui/QHeaderView>
-#include <QtGui/QLabel>
-#include <QtGui/QPlainTextEdit>
-#include <QtGui/QProgressBar>
-#include <QtGui/QWidget>
+#include <QtWidgets/QAction>
+#include <QtWidgets/QApplication>
+#include <QtWidgets/QButtonGroup>
+#include <QtWidgets/QHeaderView>
+#include <QtWidgets/QLabel>
+#include <QtWidgets/QPlainTextEdit>
+#include <QtWidgets/QProgressBar>
 
 QT_BEGIN_NAMESPACE
 
@@ -68,11 +67,12 @@ public:
         label4->setGeometry(QRect(140, 227, 66, 17));
         label4->setAlignment(Qt::AlignBottom|Qt::AlignLeading|Qt::AlignLeft);
 
-        retranslateUi(UpdaterForm);
+//        retranslateUi(UpdaterForm);
 
         QMetaObject::connectSlotsByName(UpdaterForm);
     } // setupUi
 
+/*
     void retranslateUi(QWidget *UpdaterForm)
     {
         UpdaterForm->setWindowTitle(QApplication::translate("UpdaterForm", "Updater", 0, QApplication::UnicodeUTF8));
@@ -81,6 +81,7 @@ public:
         label3->setText(QApplication::translate("UpdaterForm", "0", 0, QApplication::UnicodeUTF8));
         label4->setText(QApplication::translate("UpdaterForm", "0", 0, QApplication::UnicodeUTF8));
     } // retranslateUi
+*/
 
 };
 
