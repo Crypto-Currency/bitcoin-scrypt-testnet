@@ -4838,13 +4838,21 @@ void GenerateBitcoins(bool fGenerate, CWallet* pwallet)
 int64 GetProofOfStakeReward(int64 nCoinAge, unsigned int nBits, unsigned int nTime, int nHeight)
 {
   int64 nRewardCoinYear = 0;
+  int64 nSubsidy = 0;
   if(nHeight > getPosStartBlock())
   {  
     nRewardCoinYear = MAX_MINT_PROOF_OF_STAKE;
+    nSubsidy = nCoinAge * nRewardCoinYear / 365;
   }
-  int64 nSubsidy = nCoinAge * nRewardCoinYear / 365;
-	if (fDebug)
-        printf("GetProofOfStakeReward(): create=%s nCoinAge=%" PRI64d " nBits=%d\n", FormatMoney(nSubsidy).c_str(), nCoinAge, nBits);
+
+
+  if(nHeight>POS_REDUCE_BLOCK)
+  {
+    nSubsidy = GetBlockValue(nHeight, 0);
+  }
+
+  if (fDebug)
+    printf("GetProofOfStakeReward(): create=%s nCoinAge=%" PRI64d " nBits=%d\n", FormatMoney(nSubsidy).c_str(), nCoinAge, nBits);
 
     return nSubsidy;
 }
@@ -4852,10 +4860,10 @@ int64 GetProofOfStakeReward(int64 nCoinAge, unsigned int nBits, unsigned int nTi
 int posStartBlock = 0;
 int getPosStartBlock()
 {
-	if (!posStartBlock)
-	{
-		posStartBlock = fTestNet ? TESTNET_POS_START_BLOCK : POS_START_BLOCK;
-	}
-	return posStartBlock;
+  if (!posStartBlock)
+  {
+    posStartBlock = fTestNet ? TESTNET_POS_START_BLOCK : POS_START_BLOCK;
+  }
+  return posStartBlock;
 }
 

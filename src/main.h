@@ -56,6 +56,8 @@ static const int TESTNET_POS_START_BLOCK = 500;
 static const int POS_FIX_BLOCK=730000;
 static const int TESTNET_POS_FIX_BLOCK=4000;
 
+static const int POS_REDUCE_BLOCK = 41600;
+
 static const int64 nMaxClockDrift = 2 * 60 * 60;        // two hours
 
 // time to switch to KimotoGravityWell
