@@ -941,6 +941,10 @@ int64 GetBlockValue(int nHeight, int64 nFees)
     // Subsidy is cut in half every 4 years
     nSubsidy >>= (nHeight / 210000);
 
+//cout<<"nHeight "<<nHeight<<"\n";
+//cout<<"nSubsidy "<<nSubsidy<<"\n";
+//cout<<"nFees "<<nFees<<"\n";
+
     return nSubsidy + nFees;
 }
 
@@ -4848,13 +4852,33 @@ int64 GetProofOfStakeReward(int64 nCoinAge, unsigned int nBits, unsigned int nTi
 
   if(nHeight>POS_REDUCE_BLOCK)
   {
-    nSubsidy = GetBlockValue(nHeight, 0);
+    nSubsidy = GetBlockValue(nHeight, 0); //pos reward is now same as pow
+//cout<<"nHeight "<<nHeight<<"\n";
+//cout<<"nSubsidy "<<nSubsidy<<"\n";
+
+    nSubsidy = GetBlockValue((int)nBestHeight, 0); //pos reward is now same as pow
+//cout<<"nBestHeight "<<nHeight<<"\n";
+//cout<<"nSubsidy "<<nSubsidy<<"\n\n";
   }
 
-  if (fDebug)
+  if(fTestNet)
+  {
+    if(TESTNET_POS_REDUCE_BLOCK)
+    {
+      nSubsidy = GetBlockValue(nHeight, 0); //pos reward is now same as pow
+cout<<"nHeight "<<nHeight<<"\n";
+cout<<"nSubsidy "<<nSubsidy<<"\n";
+
+      nSubsidy = GetBlockValue((int)nBestHeight, 0); //pos reward is now same as pow
+cout<<"nBestHeight "<<nHeight<<"\n";
+cout<<"nSubsidy "<<nSubsidy<<"\n\n";
+    }
+  }
+
+  if(fDebug)
     printf("GetProofOfStakeReward(): create=%s nCoinAge=%" PRI64d " nBits=%d\n", FormatMoney(nSubsidy).c_str(), nCoinAge, nBits);
 
-    return nSubsidy;
+  return nSubsidy;
 }
 
 int posStartBlock = 0;
