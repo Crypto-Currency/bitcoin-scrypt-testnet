@@ -4863,7 +4863,7 @@ int64 GetProofOfStakeReward(int64 nCoinAge, unsigned int nBits, unsigned int nTi
 
   if(fTestNet)
   {
-    if(TESTNET_POS_REDUCE_BLOCK)
+    if(nHeight>TESTNET_POS_REDUCE_BLOCK)
     {
       nSubsidy = GetBlockValue(nHeight, 0); //pos reward is now same as pow
 cout<<"nHeight "<<nHeight<<"\n";
