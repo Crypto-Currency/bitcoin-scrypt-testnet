@@ -1733,9 +1733,24 @@ bool CTransaction::ConnectInputs(CTxDB& txdb, MapPrevTx inputs,
           uint64 nCoinAge;
           if (!GetCoinAge(txdb, nCoinAge))
             return error("ConnectInputs() : %s unable to get coin age for coinstake", GetHash().ToString().substr(0,10).c_str());
+
           int64 nStakeReward = GetValueOut() - nValueIn;
-          if (nStakeReward > GetProofOfStakeReward(nCoinAge, pindexBlock->nBits, nTime, pindexBlock->nHeight) - GetMinFee() + MIN_TX_FEE)
-            return DoS(100, error("ConnectInputs() : %s stake reward exceeded", GetHash().ToString().substr(0,10).c_str()));
+cout<<"ConnectInputs: GetValueOut "<<GetValueOut()<<"\n";
+cout<<"ConnectInputs: nValueIn "<<nValueIn<<"\n";
+cout<<"ConnectInputs: nStakeReward "<<nStakeReward<<"\n";
+cout<<"ConnectInputs: ProofOfStakeReward "<<GetProofOfStakeReward(nCoinAge, pindexBlock->nBits, nTime, pindexBlock->nHeight) - GetMinFee() + MIN_TX_FEE<<"\n";
+
+
+// check that stake value is more than reward
+          if (nStakeReward > nValueIn)
+          {
+//            return false;
+cout<<"ConnectInputs: stake amount too small"<<"\n"; 
+            return error("stake amount is too small. please dust your wallet");
+          }
+
+//          if (nStakeReward > GetProofOfStakeReward(nCoinAge, pindexBlock->nBits, nTime, pindexBlock->nHeight) - GetMinFee() + MIN_TX_FEE)
+//            return DoS(100, error("ConnectInputs() : %s stake reward exceeded", GetHash().ToString().substr(0,10).c_str()));
         }
         else
         {
@@ -4852,26 +4867,14 @@ int64 GetProofOfStakeReward(int64 nCoinAge, unsigned int nBits, unsigned int nTi
 
   if(nHeight>POS_REDUCE_BLOCK)
   {
-    nSubsidy = GetBlockValue(nHeight, 0); //pos reward is now same as pow
-//cout<<"nHeight "<<nHeight<<"\n";
-//cout<<"nSubsidy "<<nSubsidy<<"\n";
-
     nSubsidy = GetBlockValue((int)nBestHeight, 0); //pos reward is now same as pow
-//cout<<"nBestHeight "<<nHeight<<"\n";
-//cout<<"nSubsidy "<<nSubsidy<<"\n\n";
   }
 
   if(fTestNet)
   {
     if(nHeight>TESTNET_POS_REDUCE_BLOCK)
     {
-      nSubsidy = GetBlockValue(nHeight, 0); //pos reward is now same as pow
-cout<<"nHeight "<<nHeight<<"\n";
-cout<<"nSubsidy "<<nSubsidy<<"\n";
-
       nSubsidy = GetBlockValue((int)nBestHeight, 0); //pos reward is now same as pow
-cout<<"nBestHeight "<<nHeight<<"\n";
-cout<<"nSubsidy "<<nSubsidy<<"\n\n";
     }
   }
 
