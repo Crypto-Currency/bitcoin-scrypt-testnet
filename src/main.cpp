@@ -1746,7 +1746,9 @@ cout<<"ConnectInputs: ProofOfStakeReward "<<GetProofOfStakeReward(nCoinAge, pind
           {
 //            return false;
 cout<<"ConnectInputs: stake amount too small"<<"\n"; 
-            return error("stake amount is too small. please dust your wallet");
+//            return error("stake amount is too small. please dust your wallet");
+            return DoS(0, error("stake amount is too small. please dust your wallet"));
+
           }
 
 //          if (nStakeReward > GetProofOfStakeReward(nCoinAge, pindexBlock->nBits, nTime, pindexBlock->nHeight) - GetMinFee() + MIN_TX_FEE)
